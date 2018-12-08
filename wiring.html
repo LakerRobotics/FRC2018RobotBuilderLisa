@@ -1,0 +1,75 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <title>Wiring</title>
+    <style type="text/css" media="screen">
+      table {
+          text-align: left;
+          width: 400px;
+
+          border-top: 2px solid black;
+          border-bottom: 2px solid black;
+          border-collapse:collapse;
+          border-spacing:0px;
+      }
+      th {
+          border-top: 2px solid black;
+          border-bottom: 2px solid black;
+      }
+      .pound {
+          width: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Wiring</h1>
+                    <h2>DIO</h2>
+	    <table><tr>
+	        <th class="pound">#</th>
+	        <th>Sensor</th></tr>
+	                                               <tr><td>0</td><td>DriveTrain leftDriveEncoder</td><td></td></tr>
+            	                                         <tr><td>1</td><td>DriveTrain leftDriveEncoder</td><td></td></tr>
+            	                                         <tr><td>2</td><td>DriveTrain rightDriveEncoder</td><td></td></tr>
+            	                                         <tr><td>3</td><td>DriveTrain rightDriveEncoder</td><td></td></tr>
+            	                                         <tr><td>4</td><td>Elevator ENCODER_IS_WIRED_TO_TALON_NEED_TO_MANUALLY_WRITE_CODE</td><td></td></tr>
+            	                                         <tr><td>5</td><td>Elevator elevatorLimitHighDIO</td><td></td></tr>
+            	                                         <tr><td>6</td><td>Elevator elevatorLimitLowDIO </td><td></td></tr>
+            	                                         <tr><td>7</td><td>Elevator ENCODER_IS_WIRED_TO_TALON_NEED_TO_MANUALLY_WRITE_CODE</td><td></td></tr>
+            	                                                                                                                                                                                                                             	    </table>
+                    <h2>PWMs</h2>
+	    <table><tr>
+	        <th class="pound">#</th>
+	        <th>Motor</th>
+                <th>Type</th></tr>
+	                                               <tr><td>0</td><td>Intake intakeLeftPWM </td><td>Talon</td></tr>
+            	                                         <tr><td>1</td><td>Intake intakeRightPWM </td><td>Talon</td></tr>
+            	                                                     <tr><td>3</td><td>DriveTrain rightDrive1PWM </td><td>Talon</td></tr>
+            	                                         <tr><td>4</td><td>DriveTrain rightDrive2PWM </td><td>Talon</td></tr>
+            	                                                     <tr><td>6</td><td>Intake Roller</td><td>Spark</td></tr>
+            	                                         <tr><td>7</td><td>DriveTrain leftDrive1PWM </td><td>Spark</td></tr>
+            	                                         <tr><td>8</td><td>DriveTrain leftDrive2PWM </td><td>Spark</td></tr>
+            	                                                                                                                                                                                                                 	    </table>
+     
+                <h2>CAN IDs</h2>
+	<table><tr>
+	<th class="pound">ID</th>
+	<th>Device</th></tr>
+	                                                     <tr><td>1</td><td>Elevator Talon SRX 1</td><td></td></tr>
+            	                                                                                                                                                                                                                                                                                                     	</table>
+    
+            
+                        
+                    <h2>PCM 0</h2>
+	    <table><tr>
+	        <th class="pound">#</th>
+	        <th>Solenoid</th></tr>
+	                                               <tr><td>0</td><td>Catapult leftSolenoid Forward </td><td></td></tr>
+            	                                         <tr><td>1</td><td>Catapult leftSolenoid Reverse </td><td></td></tr>
+            	                                         <tr><td>2</td><td>Catapult rightSolenoid Forward </td><td></td></tr>
+            	                                         <tr><td>3</td><td>Catapult rightSolenoid Reverse </td><td></td></tr>
+            	                                         <tr><td>4</td><td>Intake IntakeSolenoid Forward </td><td></td></tr>
+            	                                         <tr><td>5</td><td>Intake IntakeSolenoid Reverse </td><td></td></tr>
+            	                                         <tr><td>6</td><td>Intake Gripper Output </td><td></td></tr>
+            	                                                                                                                                                                                                                                         	    </table>
+                                                                                                                                                                                                                                                    
+          </body>
+</html>
