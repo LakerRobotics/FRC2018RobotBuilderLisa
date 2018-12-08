@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>RobotBuilderLisa</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>edu.wpi.first.wpilib.plugins.core.nature.FRCProjectNature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>RobotBuilderMade</name>
+			<type>2</type>
+			<location>C:/Users/richard.topolewski/workspace/RobotDemo/src</location>
+		</link>
+		<link>
+			<name>src</name>
+			<type>2</type>
+			<location>C:/Users/richard.topolewski/eclipse-workspace/RobotBuilderLisa/src</location>
+		</link>
+	</linkedResources>
+</projectDescription>
