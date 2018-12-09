@@ -48,12 +48,14 @@ public class AutonTest extends Command {
     @Override
     protected void execute() {
     	count = count + 1;
-    	//so ever 10 calls (about 2 seconds)
+    	//so ever 100 calls (about 2 seconds)
     	if(count % 100 == 0) {
-    		if(Robot.catapult.launchDone()) {
     			time = time + 0.005;
+    			
+    			// Dont let thread run into the next launch (assumed to be at about 2 second)
+    			if (time > 1.7)  time = 1.7;
     			Robot.catapult.lauchTimeLimited(time);
-    		}
+    			
     	}
     	
 //    	Robot.driveTrain.arcadeDrive(50, 0);
