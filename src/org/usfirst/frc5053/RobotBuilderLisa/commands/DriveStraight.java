@@ -64,6 +64,6 @@ public class DriveStraight extends Command {
     // subsystems is scheduled to run
     @Override
     protected void interrupted() {
-    	end();
+    	end(); // Just do the same thing as when things are ended
     }
 }

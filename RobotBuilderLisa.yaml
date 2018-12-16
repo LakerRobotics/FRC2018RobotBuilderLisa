@@ -199,7 +199,7 @@ Children:
         validators: null
         value: []
       Default Command: !!robotbuilder.data.properties.TypeSelectionProperty {default: None,
-        name: Default Command, type: Command, validators: null, value: ArcadeDrive}
+        name: Default Command, type: Command, validators: null, value: DriveTeleop}
       Constants: !!robotbuilder.data.properties.ConstantsProperty
         default: []
         name: Constants
@@ -568,7 +568,7 @@ Children:
           validators: null
           value:
           - !!robotbuilder.data.properties.ValuedParameterDescriptor {name: timeout,
-            type: double, value: '0.1'}
+            type: double, value: '0'}
         Button: !!robotbuilder.data.properties.ChoicesProperty
           choices: *id023
           default: '1'
@@ -589,64 +589,6 @@ Children:
           value: whenPressed
       Base: Joystick Button
       Name: DriverRightBumper
-    - Children: []
-      Properties:
-        Joystick: !!robotbuilder.data.properties.ParentProperty {default: parent,
-          name: Joystick, validators: null, value: Driver}
-        Parameters: !!robotbuilder.data.properties.ParametersProperty
-          default: []
-          name: Parameters
-          validators: null
-          value: []
-        Button: !!robotbuilder.data.properties.ChoicesProperty
-          choices: *id023
-          default: '1'
-          name: Button
-          validators: null
-          value: '2'
-        Command: !!robotbuilder.data.properties.TypeSelectionProperty
-          default: None
-          name: Command
-          type: Command
-          validators: *id024
-          value: ArcadeDrive
-        When to Run: !!robotbuilder.data.properties.ChoicesProperty
-          choices: *id025
-          default: whileHeld
-          name: When to Run
-          validators: null
-          value: whileHeld
-      Base: Joystick Button
-      Name: DriverLeftTrigger
-    - Children: []
-      Properties:
-        Joystick: !!robotbuilder.data.properties.ParentProperty {default: parent,
-          name: Joystick, validators: null, value: Driver}
-        Parameters: !!robotbuilder.data.properties.ParametersProperty
-          default: []
-          name: Parameters
-          validators: null
-          value: []
-        Button: !!robotbuilder.data.properties.ChoicesProperty
-          choices: *id023
-          default: '1'
-          name: Button
-          validators: null
-          value: '5'
-        Command: !!robotbuilder.data.properties.TypeSelectionProperty
-          default: None
-          name: Command
-          type: Command
-          validators: *id024
-          value: ArcadeDrive
-        When to Run: !!robotbuilder.data.properties.ChoicesProperty
-          choices: *id025
-          default: whileHeld
-          name: When to Run
-          validators: null
-          value: whileHeld
-      Base: Joystick Button
-      Name: DriverLeftBumper
     - Children: []
       Properties:
         Joystick: !!robotbuilder.data.properties.ParentProperty {default: parent,
@@ -700,39 +642,6 @@ Children:
   Name: Operator Interface
 - Children:
   - Children: []
-    Properties: &id035
-      Autonomous Selection: !!robotbuilder.data.properties.BooleanProperty {default: false,
-        name: Autonomous Selection, validators: null, value: false}
-      Parameters: !!robotbuilder.data.properties.ParametersProperty
-        default:
-        - &id033 !!robotbuilder.data.properties.ParameterDescriptor {name: timeout,
-          type: double}
-        name: Parameters
-        validators: null
-        value:
-        - !!robotbuilder.data.properties.ParameterDescriptor {name: timeout, type: double}
-      Run When Disabled: !!robotbuilder.data.properties.BooleanProperty {default: false,
-        name: Run When Disabled, validators: null, value: false}
-      Requires: !!robotbuilder.data.properties.TypeSelectionProperty {default: None,
-        name: Requires, type: Subsystem, validators: null, value: Catapult}
-      Parameter presets: !!robotbuilder.data.properties.ParameterSetProperty
-        default: []
-        name: Parameter presets
-        validators: null
-        value:
-        - !!robotbuilder.data.properties.ParameterSet
-          name: SWITCH_CATAPULT_DELAY
-          parameters:
-          - {name: timeout, type: double, value: '0.1'}
-        - !!robotbuilder.data.properties.ParameterSet
-          name: SCALE_CATAPULT_DELAY
-          parameters:
-          - {name: timeout, type: double, value: '20'}
-      Button on SmartDashboard: !!robotbuilder.data.properties.BooleanProperty {default: true,
-        name: Button on SmartDashboard, validators: null, value: true}
-    Base: Timed Command
-    Name: CatapultLaunch
-  - Children: []
     Properties:
       Autonomous Selection: !!robotbuilder.data.properties.BooleanProperty {default: false,
         name: Autonomous Selection, validators: null, value: false}
@@ -744,7 +653,7 @@ Children:
       Run When Disabled: !!robotbuilder.data.properties.BooleanProperty {default: false,
         name: Run When Disabled, validators: null, value: false}
       Requires: !!robotbuilder.data.properties.TypeSelectionProperty {default: None,
-        name: Requires, type: Subsystem, validators: null, value: Catapult}
+        name: Requires, type: Subsystem, validators: null, value: DriveTrain}
       Parameter presets: !!robotbuilder.data.properties.ParameterSetProperty
         default: []
         name: Parameter presets
@@ -753,9 +662,9 @@ Children:
       Button on SmartDashboard: !!robotbuilder.data.properties.BooleanProperty {default: true,
         name: Button on SmartDashboard, validators: null, value: true}
     Base: Command
-    Name: CatapultArmed
+    Name: DriveTeleop
   - Children: []
-    Properties: &id029
+    Properties: &id030
       Autonomous Selection: !!robotbuilder.data.properties.BooleanProperty {default: false,
         name: Autonomous Selection, validators: null, value: false}
       Parameters: !!robotbuilder.data.properties.ParametersProperty
@@ -766,7 +675,7 @@ Children:
       Run When Disabled: !!robotbuilder.data.properties.BooleanProperty {default: false,
         name: Run When Disabled, validators: null, value: false}
       Requires: !!robotbuilder.data.properties.TypeSelectionProperty {default: None,
-        name: Requires, type: Subsystem, validators: null, value: None}
+        name: Requires, type: Subsystem, validators: null, value: DriveTrain}
       Parameter presets: !!robotbuilder.data.properties.ParameterSetProperty
         default: []
         name: Parameter presets
@@ -777,7 +686,7 @@ Children:
     Base: Command
     Name: DriveStraight
   - Children: []
-    Properties: &id031
+    Properties: &id032
       Autonomous Selection: !!robotbuilder.data.properties.BooleanProperty {default: false,
         name: Autonomous Selection, validators: null, value: false}
       Parameters: !!robotbuilder.data.properties.ParametersProperty
@@ -809,6 +718,28 @@ Children:
         value: []
       Run When Disabled: !!robotbuilder.data.properties.BooleanProperty {default: false,
         name: Run When Disabled, validators: null, value: false}
+      Requires: !!robotbuilder.data.properties.TypeSelectionProperty {default: None,
+        name: Requires, type: Subsystem, validators: null, value: DriveTrain}
+      Parameter presets: !!robotbuilder.data.properties.ParameterSetProperty
+        default: &id028 []
+        name: Parameter presets
+        validators: null
+        value: *id028
+      Button on SmartDashboard: !!robotbuilder.data.properties.BooleanProperty {default: true,
+        name: Button on SmartDashboard, validators: null, value: true}
+    Base: Command
+    Name: DriveTurnSwing
+  - Children: []
+    Properties:
+      Autonomous Selection: !!robotbuilder.data.properties.BooleanProperty {default: false,
+        name: Autonomous Selection, validators: null, value: false}
+      Parameters: !!robotbuilder.data.properties.ParametersProperty
+        default: []
+        name: Parameters
+        validators: null
+        value: []
+      Run When Disabled: !!robotbuilder.data.properties.BooleanProperty {default: false,
+        name: Run When Disabled, validators: null, value: false}
       Parameter presets: !!robotbuilder.data.properties.ParameterSetProperty
         default: []
         name: Parameter presets
@@ -819,9 +750,9 @@ Children:
         name: Commands
         validators: [List]
         value:
-        - &id032 !!robotbuilder.data.CommandGroupEntry
+        - &id033 !!robotbuilder.data.CommandGroupEntry
           command: &id037
-            base: &id030
+            base: &id031
               help: A command specifies an action that the robot can perform.
               name: Command
               properties:
@@ -835,10 +766,10 @@ Children:
                 validators: null
                 value: []
               - !!robotbuilder.data.properties.ParameterSetProperty
-                default: &id028 []
+                default: &id029 []
                 name: Parameter presets
                 validators: null
-                value: *id028
+                value: *id029
               - !!robotbuilder.data.properties.BooleanProperty {default: false, name: Run When Disabled,
                 validators: null, value: false}
               - !!robotbuilder.data.properties.BooleanProperty {default: false, name: Autonomous Selection,
@@ -846,7 +777,7 @@ Children:
               supports: {}
               type: Command
             name: DriveStraight
-            properties: *id029
+            properties: *id030
           hasMatch: true
           order: Sequential
           parameters:
@@ -857,9 +788,9 @@ Children:
           previous: null
         - &id036 !!robotbuilder.data.CommandGroupEntry
           command: &id038
-            base: *id030
+            base: *id031
             name: DriveTurn
-            properties: *id031
+            properties: *id032
           hasMatch: true
           order: Sequential
           parameters:
@@ -867,7 +798,7 @@ Children:
             name: ParametersProperty
             validators: null
             value: []
-          previous: *id032
+          previous: *id033
         - !!robotbuilder.data.CommandGroupEntry
           command: &id040
             base:
@@ -883,7 +814,8 @@ Children:
                 name: Parameters
                 validators: null
                 value:
-                - *id033
+                - &id035 !!robotbuilder.data.properties.ParameterDescriptor {name: timeout,
+                  type: double}
               - !!robotbuilder.data.properties.ParameterSetProperty
                 default: &id034 []
                 name: Parameter presets
@@ -896,7 +828,36 @@ Children:
               supports: {}
               type: Command
             name: CatapultLaunch
-            properties: *id035
+            properties: &id043
+              Autonomous Selection: !!robotbuilder.data.properties.BooleanProperty {
+                default: false, name: Autonomous Selection, validators: null, value: false}
+              Parameters: !!robotbuilder.data.properties.ParametersProperty
+                default:
+                - *id035
+                name: Parameters
+                validators: null
+                value:
+                - !!robotbuilder.data.properties.ParameterDescriptor {name: timeout,
+                  type: double}
+              Run When Disabled: !!robotbuilder.data.properties.BooleanProperty {
+                default: false, name: Run When Disabled, validators: null, value: false}
+              Requires: !!robotbuilder.data.properties.TypeSelectionProperty {default: None,
+                name: Requires, type: Subsystem, validators: null, value: Catapult}
+              Parameter presets: !!robotbuilder.data.properties.ParameterSetProperty
+                default: []
+                name: Parameter presets
+                validators: null
+                value:
+                - !!robotbuilder.data.properties.ParameterSet
+                  name: SWITCH_CATAPULT_DELAY
+                  parameters:
+                  - {name: timeout, type: double, value: '0.1'}
+                - !!robotbuilder.data.properties.ParameterSet
+                  name: SCALE_CATAPULT_DELAY
+                  parameters:
+                  - {name: timeout, type: double, value: '20'}
+              Button on SmartDashboard: !!robotbuilder.data.properties.BooleanProperty {
+                default: true, name: Button on SmartDashboard, validators: null, value: true}
           hasMatch: true
           order: Parallel
           parameters:
@@ -984,7 +945,7 @@ Children:
       Button on SmartDashboard: !!robotbuilder.data.properties.BooleanProperty {default: true,
         name: Button on SmartDashboard, validators: null, value: true}
     Base: Command
-    Name: ArcadeDrive
+    Name: AutonTest
   - Children: []
     Properties:
       Autonomous Selection: !!robotbuilder.data.properties.BooleanProperty {default: false,
@@ -997,29 +958,7 @@ Children:
       Run When Disabled: !!robotbuilder.data.properties.BooleanProperty {default: false,
         name: Run When Disabled, validators: null, value: false}
       Requires: !!robotbuilder.data.properties.TypeSelectionProperty {default: None,
-        name: Requires, type: Subsystem, validators: null, value: DriveTrain}
-      Parameter presets: !!robotbuilder.data.properties.ParameterSetProperty
-        default: []
-        name: Parameter presets
-        validators: null
-        value: []
-      Button on SmartDashboard: !!robotbuilder.data.properties.BooleanProperty {default: true,
-        name: Button on SmartDashboard, validators: null, value: false}
-    Base: Command
-    Name: TeleopDrive
-  - Children: []
-    Properties:
-      Autonomous Selection: !!robotbuilder.data.properties.BooleanProperty {default: false,
-        name: Autonomous Selection, validators: null, value: false}
-      Parameters: !!robotbuilder.data.properties.ParametersProperty
-        default: []
-        name: Parameters
-        validators: null
-        value: []
-      Run When Disabled: !!robotbuilder.data.properties.BooleanProperty {default: false,
-        name: Run When Disabled, validators: null, value: false}
-      Requires: !!robotbuilder.data.properties.TypeSelectionProperty {default: None,
-        name: Requires, type: Subsystem, validators: null, value: DriveTrain}
+        name: Requires, type: Subsystem, validators: null, value: Catapult}
       Parameter presets: !!robotbuilder.data.properties.ParameterSetProperty
         default: []
         name: Parameter presets
@@ -1028,7 +967,11 @@ Children:
       Button on SmartDashboard: !!robotbuilder.data.properties.BooleanProperty {default: true,
         name: Button on SmartDashboard, validators: null, value: true}
     Base: Command
-    Name: AutonTest
+    Name: CatapultArmed
+  - Children: []
+    Properties: *id043
+    Base: Timed Command
+    Name: CatapultLaunch
   - Children: []
     Properties:
       Autonomous Selection: !!robotbuilder.data.properties.BooleanProperty {default: false,
@@ -1051,28 +994,6 @@ Children:
         name: Button on SmartDashboard, validators: null, value: true}
     Base: Command
     Name: Left intake
-  - Children: []
-    Properties:
-      Autonomous Selection: !!robotbuilder.data.properties.BooleanProperty {default: false,
-        name: Autonomous Selection, validators: null, value: false}
-      Parameters: !!robotbuilder.data.properties.ParametersProperty
-        default: []
-        name: Parameters
-        validators: null
-        value: []
-      Run When Disabled: !!robotbuilder.data.properties.BooleanProperty {default: false,
-        name: Run When Disabled, validators: null, value: false}
-      Requires: !!robotbuilder.data.properties.TypeSelectionProperty {default: None,
-        name: Requires, type: Subsystem, validators: null, value: DriveTrain}
-      Parameter presets: !!robotbuilder.data.properties.ParameterSetProperty
-        default: &id043 []
-        name: Parameter presets
-        validators: null
-        value: *id043
-      Button on SmartDashboard: !!robotbuilder.data.properties.BooleanProperty {default: true,
-        name: Button on SmartDashboard, validators: null, value: true}
-    Base: Command
-    Name: DriveSwingTurn
   Properties: {}
   Base: Commands
   Name: Commands
