@@ -117,7 +117,7 @@ public class MotionController
 			{
 				//Instantiates a new MotionControlHelper() object for the new turn segment
 				m_TurnControl = new AdjustSpeedAsTravelMotionControlHelper(m_targetAngle, ramp, maxSpeed, start, m_TurnSource, new PIDOutputDriveTurn(m_DriveTrain));
-				m_TurnControl.setTargetDistance(m_targetAngle);
+//DontThinkNeeded				m_TurnControl.setTargetDistance(m_targetAngle);
 				
 				//Instantiates a new MotionControlPIDController() object for the new turn segment using the previous MotionControlHelper()
 				m_TurnPIDController = new MotionControlPIDController(TurnKp, TurnKi, TurnKd, m_TurnControl);

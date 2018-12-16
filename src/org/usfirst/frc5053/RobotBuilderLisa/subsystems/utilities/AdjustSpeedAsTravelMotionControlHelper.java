@@ -46,9 +46,9 @@ public class AdjustSpeedAsTravelMotionControlHelper extends AdjustSpeedAsTravelH
 
     	}
 
-    public void setTargetDistance(double new_targetDistance){
-		m_targetDistance = new_targetDistance;
-	}
+//DontThinkNeeded    public void setTargetDistance(double new_targetDistance){
+//DontThinkNeeded		m_targetDistance = new_targetDistance;
+//DontThinkNeeded	}
 
 
     /**
