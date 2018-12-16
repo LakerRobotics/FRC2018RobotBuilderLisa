@@ -38,6 +38,7 @@ public class DriveTurn extends Command {
     // Called just before this Command runs the first time
     @Override
     protected void initialize() {
+    	Robot.driveTrain.the_driveTrainMotionControl.TurnToAngle(90);
     }
 
     // Called repeatedly when this Command is scheduled to run
@@ -48,17 +49,22 @@ public class DriveTurn extends Command {
     // Make this return true when this Command no longer needs to run execute()
     @Override
     protected boolean isFinished() {
-        return false;
+    	return Robot.driveTrain.the_driveTrainMotionControl.isTurnPIDFinished();
     }
 
     // Called once after isFinished returns true
     @Override
     protected void end() {
+    	Robot.driveTrain.the_driveTrainMotionControl.DisablePIDControl();
+    	Robot.driveTrain.the_driveTrainMotionControl.ArcadeDrive(0, 0);
     }
 
     // Called when another command which requires one or more of the same
     // subsystems is scheduled to run
     @Override
     protected void interrupted() {
+       	end(); // Just do the same thing as when things are ended
     }
+
+
 }

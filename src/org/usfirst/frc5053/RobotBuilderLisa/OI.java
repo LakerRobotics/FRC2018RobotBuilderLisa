@@ -82,7 +82,7 @@ public class OI {
         SmartDashboard.putData("DriveTeleop", new DriveTeleop());
         SmartDashboard.putData("DriveStraight", new DriveStraight());
         SmartDashboard.putData("DriveTurn", new DriveTurn());
-        SmartDashboard.putData("DriveSwingTurn", new DriveSwingTurn());
+        SmartDashboard.putData("DriveSwingTurn", new DriveTurnSwing());
         SmartDashboard.putData("DriveSquare", new DriveSquare());
         SmartDashboard.putData("AutonTest", new AutonTest());
         SmartDashboard.putData("CatapultArmed", new CatapultArmed());
