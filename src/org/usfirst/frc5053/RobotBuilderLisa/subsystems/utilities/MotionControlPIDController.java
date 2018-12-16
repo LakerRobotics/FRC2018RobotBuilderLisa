@@ -12,7 +12,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.BoundaryException;
 
 public class MotionControlPIDController extends PIDController {
-	MotionControlHelper m_motionControlHelper; 
+	AdjustSpeedAsTravelHelper m_motionControlHelper; 
 	/**
 	 * 
 	 * @return
@@ -33,28 +33,28 @@ public class MotionControlPIDController extends PIDController {
 //		return m_motionControlHelper;
 //	}
 
-	public MotionControlPIDController(double Kp, double Ki, double Kd, MotionControlHelper motionControl) 
+	public MotionControlPIDController(double Kp, double Ki, double Kd, AdjustSpeedAsTravelHelper motionControl) 
 	{
 		super(Kp, Ki, Kd, motionControl.getM_source(), motionControl.getM_output());
 		m_motionControlHelper = motionControl;
 		motionControl.setRegularPIDControl(this);// to let the motionControl adjust the Rate, ie do the motion control
 	}
 	
-	public MotionControlPIDController(double Kp, double Ki, double Kd, MotionControlHelper motionControl, double period) 
+	public MotionControlPIDController(double Kp, double Ki, double Kd, AdjustSpeedAsTravelHelper motionControl, double period) 
 	{
 		super(Kp, Ki, Kd, motionControl.getM_source(), motionControl.getM_output(), period);
 		m_motionControlHelper = motionControl;
 		motionControl.setRegularPIDControl(this);// to let the motionControl adjust the Rate, ie do the motion control
 	}
 
-	public MotionControlPIDController(double Kp, double Ki, double Kd, double Kf, MotionControlHelper motionControl) 
+	public MotionControlPIDController(double Kp, double Ki, double Kd, double Kf, AdjustSpeedAsTravelHelper motionControl) 
 	{
 		super(Kp, Ki, Kd, Kf, motionControl.getM_source(), motionControl.getM_output());
 		m_motionControlHelper = motionControl;
 		motionControl.setRegularPIDControl(this);// to let the motionControl adjust the Rate, ie do the motion control
 	}
 
-	public MotionControlPIDController(double Kp, double Ki, double Kd, double Kf, double period, MotionControlHelper motionControl) 
+	public MotionControlPIDController(double Kp, double Ki, double Kd, double Kf, double period, AdjustSpeedAsTravelHelper motionControl) 
 	{
 		super(Kp, Ki, Kd, Kf, motionControl.getM_source(), motionControl.getM_output(), period);
 		m_motionControlHelper = motionControl; 

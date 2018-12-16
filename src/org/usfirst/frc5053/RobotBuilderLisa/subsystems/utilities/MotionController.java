@@ -1,7 +1,7 @@
 package org.usfirst.frc5053.RobotBuilderLisa.subsystems.utilities;
 
 import org.usfirst.frc5053.RobotBuilderLisa.subsystems.DriveTrainMotionControl;
-import org.usfirst.frc5053.RobotBuilderLisa.subsystems.utilities.MotionControlHelper;
+import org.usfirst.frc5053.RobotBuilderLisa.subsystems.utilities.AdjustSpeedAsTravelMotionControlHelper;
 import org.usfirst.frc5053.RobotBuilderLisa.subsystems.utilities.MotionControlPIDController;
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -9,13 +9,13 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class MotionController 
 {
 	private DriveTrainMotionControl m_DriveTrain;
-	private MotionControlHelper m_StraightControl;
-	private MotionControlHelper m_TurnControl;
-	private MotionControlHelper m_ArcControl;
+	private AdjustSpeedAsTravelHelper m_StraightControl;
+	private AdjustSpeedAsTravelMotionControlHelper m_TurnControl;
+	private AdjustSpeedAsTravelHelper m_ArcControl;
 	
 	private MotionControlPIDController m_StraightPIDController;
-	private StraightMotionPIDOutput m_StraightPIDOutput;
-	private ControlledAngleDrivePIDOutput m_ControlledAngleDrivePIDOutput;
+	private PIDOutputStraightMotion m_StraightPIDOutput;
+	private PIDOutputControlledAngleDrive m_ControlledAngleDrivePIDOutput;
 	private MotionControlPIDController m_ControlledAngleDrivePIDController;
 	private MotionControlPIDController m_TurnPIDController;
 	private MotionControlPIDController m_ArcPIDController;
@@ -81,8 +81,8 @@ public class MotionController
 			if (!(Math.abs(m_DriveTrain.GetLeftDistance()) > Math.abs(m_targetDistance)))
 			{
 				//Instantiates a new MotionControlHelper() object for the new drive segment
-				m_StraightPIDOutput = new StraightMotionPIDOutput(m_DriveTrain, m_TurnSource, m_targetAngle);
-				m_StraightControl = new MotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_StraightSource, m_StraightPIDOutput);
+				m_StraightPIDOutput = new PIDOutputStraightMotion(m_DriveTrain, m_TurnSource, m_targetAngle);
+				m_StraightControl = new AdjustSpeedAsTravelMotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_StraightSource, m_StraightPIDOutput);
 				
 				//Instantiates a new MotionControlPIDController() object for the new drive segment using the previous MotionControlHelper()
 				m_StraightPIDController = new MotionControlPIDController(StraightKp, StraightKi, StraightKd, m_StraightControl);
@@ -116,7 +116,7 @@ public class MotionController
 			if (!(Math.abs(m_DriveTrain.GetAngle()-m_targetAngle) < m_TurnTolerance))
 			{
 				//Instantiates a new MotionControlHelper() object for the new turn segment
-				m_TurnControl = new MotionControlHelper(m_targetAngle, ramp, maxSpeed, start, m_TurnSource, new DriveTurnPIDOutput(m_DriveTrain));
+				m_TurnControl = new AdjustSpeedAsTravelMotionControlHelper(m_targetAngle, ramp, maxSpeed, start, m_TurnSource, new PIDOutputDriveTurn(m_DriveTrain));
 				m_TurnControl.setTargetDistance(m_targetAngle);
 				
 				//Instantiates a new MotionControlPIDController() object for the new turn segment using the previous MotionControlHelper()
@@ -151,8 +151,8 @@ public class MotionController
 			if (!(Math.abs(m_DriveTrain.GetLeftDistance()) > Math.abs(m_targetDistance)))
 			{
 				//Instantiates a new MotionControlHelper() object for the new drive segment
-				m_ControlledAngleDrivePIDOutput = new ControlledAngleDrivePIDOutput(m_DriveTrain, m_TurnSource, m_targetAngle);
-				m_StraightControl = new MotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_StraightSource, m_ControlledAngleDrivePIDOutput);
+				m_ControlledAngleDrivePIDOutput = new PIDOutputControlledAngleDrive(m_DriveTrain, m_TurnSource, m_targetAngle);
+				m_StraightControl = new AdjustSpeedAsTravelMotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_StraightSource, m_ControlledAngleDrivePIDOutput);
 				
 				//Instantiates a new MotionControlPIDController() object for the new drive segment using the previous MotionControlHelper()
 				m_ControlledAngleDrivePIDController = new MotionControlPIDController(StraightKp, StraightKi, StraightKd, m_StraightControl);
@@ -183,7 +183,7 @@ public class MotionController
 		
 		double start = 0;
 
-		ArcMotionPIDOutput motionControlArc;
+		PIDOutputArcMotion motionControlArc;
 		
 		if (!isPIDEnabled())
 		{
@@ -191,11 +191,11 @@ public class MotionController
 			double convertedSpeed = maxSpeed * 12; 	// convert from feet to inches/second
 			double convertedRamp = ramp; 			// in inches
 			
-			motionControlArc = new ArcMotionPIDOutput(m_DriveTrain, m_TurnSource, radiusOfArc/12);
+			motionControlArc = new PIDOutputArcMotion(m_DriveTrain, m_TurnSource, radiusOfArc/12);
 
 			//Instantiates a new MotionControlHelper() object for the new Arch segment
 			// motionControlForwardSpeed
-			m_ArcControl = new MotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_StraightSource, motionControlArc);
+			m_ArcControl = new AdjustSpeedAsTravelMotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_StraightSource, motionControlArc);
 			
 			//Instantiates a new MotionControlPIDController() object for the new turn segment using the previous MotionControlHelper()
 			m_ArcPIDController = new MotionControlPIDController(ArcKp, ArcKi, ArcKd, m_ArcControl);

@@ -19,7 +19,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 	 * and also adjust the speed going to the wheels to drive straight
 	 *
 	 */
-	public class ControlledAngleDrivePIDOutput implements PIDOutput {
+	public class PIDOutputStraightMotion implements PIDOutput {
 		
 		// This is just a simple P control, Proportional control of the line follow
 		// if we assume angle is in degrees and if we were off by 20 Degrees then we would want how much correction
@@ -33,7 +33,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 		
 		private final double SPEED_MODIFIER = 1.00;
 
-		public ControlledAngleDrivePIDOutput(DriveTrainMotionControl drivetrain, PIDSource turnSource, double targetAngle) 
+		public PIDOutputStraightMotion(DriveTrainMotionControl drivetrain, PIDSource turnSource, double targetAngle) 
 		{
 			m_targetAngle = targetAngle;
 			m_driveTrain = drivetrain;
@@ -99,10 +99,10 @@ import edu.wpi.first.wpilibj.PIDOutput;
 		 
 		    MotionControlPIDController localRotationSpeedPID;
 
-		    MotionControlHelper rotationSpeedProfile; 
-	        rotationSpeedProfile = new MotionControlHelper(targetAngle, ramp, maxspeed, start, m_TurnSource, pidOutput);
+		    AdjustSpeedAsTravelHelper rotationSpeedProfile; 
+	        rotationSpeedProfile = new AdjustSpeedAsTravelMotionControlHelper(targetAngle, ramp, maxspeed, start, m_TurnSource, pidOutput);
 	        localRotationSpeedPID = new MotionControlPIDController(Kp,Ki,Kd, rotationSpeedProfile );
-	        localRotationSpeedPID.setOutputRange(-0.5, 0.5);
+	        localRotationSpeedPID.setOutputRange(-1.0, 1.0);
 	        localRotationSpeedPID.setPID(Kp, Ki, Kd, 0);
 	        localRotationSpeedPID.enable();
 		    return localRotationSpeedPID;
@@ -112,9 +112,9 @@ import edu.wpi.first.wpilibj.PIDOutput;
 	    private class WrapRotationPIDOutput implements PIDOutput 
 	    {
 
-	        private ControlledAngleDrivePIDOutput m_RotationPowerDestination;
+	        private PIDOutputStraightMotion m_RotationPowerDestination;
 
-	        public WrapRotationPIDOutput(ControlledAngleDrivePIDOutput rotationPowerDesintation) 
+	        public WrapRotationPIDOutput(PIDOutputStraightMotion rotationPowerDesintation) 
 	        {
 	            if (rotationPowerDesintation == null) {
 	                throw new NullPointerException("Given rotationPowerDestination was null");
@@ -127,7 +127,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 			@Override
 			public void pidWrite(double rotationPower) 
 			{
-				this.m_RotationPowerDestination.setRotationPower(-rotationPower);
+				this.m_RotationPowerDestination.setRotationPower(-rotationPower); // Inverted because it's stupid
 			}
 
 	    }

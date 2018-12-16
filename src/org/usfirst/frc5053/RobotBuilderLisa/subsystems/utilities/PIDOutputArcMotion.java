@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.PIDSource;
 	 * and adjust the power difference between the wheels to drive on an arc of specified Radius 
 	 *
 	 */
-	public class ArcMotionPIDOutput implements PIDOutput {
+	public class PIDOutputArcMotion implements PIDOutput {
 		//Gyro gyro = Robot.getRobotSensors().getGyro();
 		
 		// This is just a simple P control, Proportional control of the line follow
@@ -31,7 +31,7 @@ import edu.wpi.first.wpilibj.PIDSource;
 		private double m_ArcRadius;
 		MotionControlPIDController m_ArcRotationSpeedPID;
 
-		public ArcMotionPIDOutput(DriveTrainMotionControl drive, PIDSource anglePIDSource, double arcRadius) {
+		public PIDOutputArcMotion(DriveTrainMotionControl drive, PIDSource anglePIDSource, double arcRadius) {
 			//SmartDashboard.putString("DriveSpinPIDOutput", "constructor called");
 			m_RobotDrive 	= drive;
 			m_Gyro 			= anglePIDSource	;
@@ -128,14 +128,14 @@ import edu.wpi.first.wpilibj.PIDSource;
 		 
 		    MotionControlPIDController localRotationSpeedPID;
 
-		    MotionControlHelper rotationSpeedProfile; 
+		    AdjustSpeedAsTravelHelper rotationSpeedProfile; 
 		    
 		    //TODO have go a a rotation speed proportional to the average speed of the wheels
 		    // Okay this had been adjusting the speedOfRotation based on how far off they were instead it needs to be adjusted based
 		    // on the speed of the robot
 		    // Could do this or could just be more generic and follow the speed of the robot, think this is simplier to start
 	        
-		    rotationSpeedProfile = new MotionControlHelper(targetAngle, ramp, maxspeed, startAngle, m_Gyro, pidOutput);// this is being overiden in this.pidWrite()
+		    rotationSpeedProfile = new AdjustSpeedAsTravelMotionControlHelper(targetAngle, ramp, maxspeed, startAngle, m_Gyro, pidOutput);// this is being overiden in this.pidWrite()
 	        
 		    //TODO have the targetAngle stop the adjustment from this.pidWrite(..)
 	        
@@ -156,10 +156,10 @@ import edu.wpi.first.wpilibj.PIDSource;
 	    
 		private class WrapArcPIDOutput implements PIDOutput {
 
-	        private ArcMotionPIDOutput m_RotationPowerDestination;
+	        private PIDOutputArcMotion m_RotationPowerDestination;
 
 	        //Constructor
-	        public WrapArcPIDOutput(ArcMotionPIDOutput rotationPowerDesintation) {
+	        public WrapArcPIDOutput(PIDOutputArcMotion rotationPowerDesintation) {
 	            if (rotationPowerDesintation == null) 
 	            {
 	                throw new NullPointerException("Given rotationPowerDestination was null");
