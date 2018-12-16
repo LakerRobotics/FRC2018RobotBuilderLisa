@@ -133,6 +133,7 @@ public class MotionController
 		}
 		return true;
 	}
+	
 	public boolean ExecuteControlledAngleDriveMotion(double distance, double maxspeed, double ramp, double angle)
 	{
 		if (!m_PIDEnabled)
@@ -172,7 +173,7 @@ public class MotionController
 	 * @param distance  to travel in inches
 	 * @param maxSpeed  in ft/sec
 	 * @param ramp      in inches
-	 * @param radiusOfArc  The arc travel path of the robot
+	 * @param radiusOfArc  The radius of the arc travel path of the robot in inches
 	 * @return true if it has completed the arc path
 	 */
 	public boolean ExecuteArcMotion(double distance, double maxSpeed, double ramp, double radiusOfArc)
@@ -190,7 +191,7 @@ public class MotionController
 			double convertedSpeed = maxSpeed * 12; 	// convert from feet to inches/second
 			double convertedRamp = ramp; 			// in inches
 			
-			motionControlArc = new ArcMotionPIDOutput(m_DriveTrain, m_TurnSource, radiusOfArc);
+			motionControlArc = new ArcMotionPIDOutput(m_DriveTrain, m_TurnSource, radiusOfArc/12);
 
 			//Instantiates a new MotionControlHelper() object for the new Arch segment
 			// motionControlForwardSpeed
@@ -206,6 +207,7 @@ public class MotionController
 		}
 		return true;
 	}
+	
 	public boolean isStraightMotionFinished()
 	{
 		/*
@@ -232,6 +234,7 @@ public class MotionController
 		}
 		return false;
 	}
+	
 	public boolean isTurnMotionFinished()
 	{
 		/*
@@ -247,6 +250,7 @@ public class MotionController
 		}
 		return false;
 	}
+	
 	public boolean isArcMotionFinished()
 	{
 		/*
@@ -262,27 +266,31 @@ public class MotionController
 		{
 			//Always tripped
 			m_ArcPIDController.disable();
-			m_DriveTrain.ArcadeDrive(0, 0);
+//Dont stop, let motion flow to next if desired			m_DriveTrain.ArcadeDrive(0, 0);
 			m_PIDEnabled = false;
 			return true;
 		}
 		return false;
 	}
+
 	public boolean isPIDEnabled()
 	{
 		return m_PIDEnabled;
 	}
+	
 	public void DisablePIDControls()
 	{
 		if(m_TurnPIDController != null)
 		{
 			m_TurnPIDController.disable();
 		}
+		
 		if(m_StraightPIDController != null)
 		{
 			m_StraightPIDController.disable();
 			m_StraightPIDOutput.disableRotationController();
 		}
+		
 		if(m_ControlledAngleDrivePIDController != null)
 		{
 			m_ControlledAngleDrivePIDController.disable();

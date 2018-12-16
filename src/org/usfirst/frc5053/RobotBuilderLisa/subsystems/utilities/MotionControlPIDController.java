@@ -22,17 +22,16 @@ public class MotionControlPIDController extends PIDController {
 	public double getRate() throws Exception
 	{
 		// Set the PIDSource to return Rate and then get the Rate.
-		
 		m_motionControlHelper.getM_source().setPIDSourceType(PIDSourceType.kRate);
-		SmartDashboard.putNumber("Motion Control Rate", this.getRate());
+// This looks like a recusive loop which is bad so 		SmartDashboard.putNumber("Motion Control Rate", this.getRate());
+		SmartDashboard.putNumber("MotionControlPIDController Rate", m_motionControlHelper.getM_source().pidGet());
 		return m_motionControlHelper.getM_source().pidGet();
 	}
 	
-	public MotionControlHelper getMotionControlHelper()
-	{
-		return m_motionControlHelper;
-	}
-
+//	public MotionControlHelper getMotionControlHelper()
+//	{
+//		return m_motionControlHelper;
+//	}
 
 	public MotionControlPIDController(double Kp, double Ki, double Kd, MotionControlHelper motionControl) 
 	{
