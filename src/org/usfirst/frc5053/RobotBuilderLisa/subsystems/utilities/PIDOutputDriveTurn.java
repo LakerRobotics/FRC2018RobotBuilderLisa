@@ -6,11 +6,11 @@ import edu.wpi.first.wpilibj.PIDOutput;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
-public class DriveTurnPIDOutput implements PIDOutput {
+public class PIDOutputDriveTurn implements PIDOutput {
 
 	DriveTrainMotionControl m_DriveTrain;
 	
-	public DriveTurnPIDOutput(DriveTrainMotionControl driveTrain) {
+	public PIDOutputDriveTurn(DriveTrainMotionControl driveTrain) {
 	    SmartDashboard.putString("DriveSpinPIDOutput", "constructor called");
 	    m_DriveTrain = driveTrain;
 	}

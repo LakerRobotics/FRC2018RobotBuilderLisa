@@ -33,8 +33,7 @@ public class AnglePIDWrapper implements PIDOutput, PIDSource {
 
 	@Override
 	public void pidWrite(double output) {
-		// TODO I had to invert this
-		m_DriveTrain.setTurn(-output);
+		m_DriveTrain.setTurn(output);
 	}
 
 }

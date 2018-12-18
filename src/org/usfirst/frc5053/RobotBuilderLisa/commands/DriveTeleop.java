@@ -58,7 +58,7 @@ public class DriveTeleop extends Command {
     	// - | +
     	Robot.driveTrain.the_driveTrainMotionControl.ArcadeDrive(
     			
-    			-Robot.oi.joysticks.GetDriverLeftY()*driveSpeed,
+    			Robot.oi.joysticks.GetDriverLeftY()*driveSpeed,
     			
     			Robot.oi.joysticks.GetDriverRightX()*driveSpeed );
     }
