@@ -296,5 +296,10 @@ public class MotionController
 			m_ControlledAngleDrivePIDController.disable();
 			m_ControlledAngleDrivePIDOutput.disableRotationController();
 		}
+		
+		if(m_ArcPIDController != null) {
+			m_ArcPIDController.disable();
+		}
+		
 	}
 }

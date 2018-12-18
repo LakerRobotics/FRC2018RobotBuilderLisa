@@ -13,7 +13,7 @@ Children:
           default: '0'
           name: Channel A Channel (Digital)
           validators: &id002 [DigitalChannel]
-          value: '3'
+          value: '2'
         Distance Per Pulse: !!robotbuilder.data.properties.DoubleProperty {default: 1,
           name: Distance Per Pulse, validators: null, value: 1.0}
         PID Source: !!robotbuilder.data.properties.ChoicesProperty
@@ -37,7 +37,7 @@ Children:
           default: '0'
           name: Channel B Channel (Digital)
           validators: &id006 [DigitalChannel]
-          value: '2'
+          value: '3'
       Base: Quadrature Encoder
       Name: rightDriveEncoder
     - Children: []
@@ -47,7 +47,7 @@ Children:
           default: '0'
           name: Channel A Channel (Digital)
           validators: *id002
-          value: '1'
+          value: '0'
         Distance Per Pulse: !!robotbuilder.data.properties.DoubleProperty {default: 1,
           name: Distance Per Pulse, validators: null, value: 1.0}
         PID Source: !!robotbuilder.data.properties.ChoicesProperty
@@ -69,7 +69,7 @@ Children:
           default: '0'
           name: Channel B Channel (Digital)
           validators: *id006
-          value: '0'
+          value: '1'
       Base: Quadrature Encoder
       Name: leftDriveEncoder
     - Children:
@@ -90,7 +90,7 @@ Children:
             validators: &id009 [PWMOutput]
             value: '7'
           Inverted: !!robotbuilder.data.properties.BooleanProperty {default: false,
-            name: Inverted, validators: null, value: false}
+            name: Inverted, validators: null, value: true}
         Base: Speed Controller
         Name: 'leftDrive1PWM '
       - Children: []
@@ -108,7 +108,7 @@ Children:
             validators: *id009
             value: '8'
           Inverted: !!robotbuilder.data.properties.BooleanProperty {default: false,
-            name: Inverted, validators: null, value: false}
+            name: Inverted, validators: null, value: true}
         Base: Speed Controller
         Name: 'leftDrive2PWM '
       Properties:
@@ -148,7 +148,7 @@ Children:
             validators: *id009
             value: '4'
           Inverted: !!robotbuilder.data.properties.BooleanProperty {default: false,
-            name: Inverted, validators: null, value: false}
+            name: Inverted, validators: null, value: true}
         Base: Speed Controller
         Name: 'rightDrive2PWM '
       - Children: []
@@ -166,7 +166,7 @@ Children:
             validators: *id009
             value: '3'
           Inverted: !!robotbuilder.data.properties.BooleanProperty {default: false,
-            name: Inverted, validators: null, value: false}
+            name: Inverted, validators: null, value: true}
         Base: Speed Controller
         Name: 'rightDrive1PWM '
       Properties:
@@ -664,7 +664,7 @@ Children:
     Base: Command
     Name: DriveTeleop
   - Children: []
-    Properties: &id030
+    Properties: &id029
       Autonomous Selection: !!robotbuilder.data.properties.BooleanProperty {default: false,
         name: Autonomous Selection, validators: null, value: false}
       Parameters: !!robotbuilder.data.properties.ParametersProperty
@@ -686,7 +686,7 @@ Children:
     Base: Command
     Name: DriveStraight
   - Children: []
-    Properties: &id032
+    Properties: &id031
       Autonomous Selection: !!robotbuilder.data.properties.BooleanProperty {default: false,
         name: Autonomous Selection, validators: null, value: false}
       Parameters: !!robotbuilder.data.properties.ParametersProperty
@@ -743,10 +743,10 @@ Children:
       Requires: !!robotbuilder.data.properties.TypeSelectionProperty {default: None,
         name: Requires, type: Subsystem, validators: null, value: DriveTrain}
       Parameter presets: !!robotbuilder.data.properties.ParameterSetProperty
-        default: &id028 []
+        default: []
         name: Parameter presets
         validators: null
-        value: *id028
+        value: []
       Button on SmartDashboard: !!robotbuilder.data.properties.BooleanProperty {default: true,
         name: Button on SmartDashboard, validators: null, value: true}
     Base: Command
@@ -772,9 +772,9 @@ Children:
         name: Commands
         validators: [List]
         value:
-        - &id033 !!robotbuilder.data.CommandGroupEntry
-          command: &id036
-            base: &id031
+        - &id032 !!robotbuilder.data.CommandGroupEntry
+          command: &id035
+            base: &id030
               help: A command specifies an action that the robot can perform.
               name: Command
               properties:
@@ -788,10 +788,10 @@ Children:
                 validators: null
                 value: []
               - !!robotbuilder.data.properties.ParameterSetProperty
-                default: &id029 []
+                default: &id028 []
                 name: Parameter presets
                 validators: null
-                value: *id029
+                value: *id028
               - !!robotbuilder.data.properties.BooleanProperty {default: false, name: Run When Disabled,
                 validators: null, value: false}
               - !!robotbuilder.data.properties.BooleanProperty {default: false, name: Autonomous Selection,
@@ -799,7 +799,7 @@ Children:
               supports: {}
               type: Command
             name: DriveStraight
-            properties: *id030
+            properties: *id029
           hasMatch: true
           order: Sequential
           parameters:
@@ -808,11 +808,11 @@ Children:
             validators: null
             value: []
           previous: null
-        - &id035 !!robotbuilder.data.CommandGroupEntry
-          command: &id037
-            base: *id031
+        - &id034 !!robotbuilder.data.CommandGroupEntry
+          command: &id036
+            base: *id030
             name: DriveTurn
-            properties: *id032
+            properties: *id031
           hasMatch: true
           order: Sequential
           parameters:
@@ -820,9 +820,9 @@ Children:
             name: ParametersProperty
             validators: null
             value: []
-          previous: *id033
+          previous: *id032
         - !!robotbuilder.data.CommandGroupEntry
-          command: &id039
+          command: &id038
             base:
               help: A command specifies an action that the robot can perform and finishes after a timeout.
               name: Timed Command
@@ -839,10 +839,10 @@ Children:
                 - !!robotbuilder.data.properties.ParameterDescriptor {name: timeout,
                   type: double}
               - !!robotbuilder.data.properties.ParameterSetProperty
-                default: &id034 []
+                default: &id033 []
                 name: Parameter presets
                 validators: null
-                value: *id034
+                value: *id033
               - !!robotbuilder.data.properties.BooleanProperty {default: false, name: Run When Disabled,
                 validators: null, value: false}
               - !!robotbuilder.data.properties.BooleanProperty {default: false, name: Autonomous Selection,
@@ -850,7 +850,7 @@ Children:
               supports: {}
               type: Command
             name: CatapultLaunch
-            properties: &id042
+            properties: &id041
               Autonomous Selection: !!robotbuilder.data.properties.BooleanProperty {
                 default: false, name: Autonomous Selection, validators: null, value: false}
               Parameters: !!robotbuilder.data.properties.ParametersProperty
@@ -890,8 +890,18 @@ Children:
             value:
             - !!robotbuilder.data.properties.ValuedParameterDescriptor {name: timeout,
               type: double, value: '0.1'}
-          previous: *id035
-        - &id038 !!robotbuilder.data.CommandGroupEntry
+          previous: *id034
+        - &id037 !!robotbuilder.data.CommandGroupEntry
+          command: *id035
+          hasMatch: true
+          order: Sequential
+          parameters:
+            default: []
+            name: ParametersProperty
+            validators: null
+            value: []
+          previous: *id034
+        - &id039 !!robotbuilder.data.CommandGroupEntry
           command: *id036
           hasMatch: true
           order: Sequential
@@ -900,19 +910,9 @@ Children:
             name: ParametersProperty
             validators: null
             value: []
-          previous: *id035
-        - &id040 !!robotbuilder.data.CommandGroupEntry
-          command: *id037
-          hasMatch: true
-          order: Sequential
-          parameters:
-            default: []
-            name: ParametersProperty
-            validators: null
-            value: []
-          previous: *id038
+          previous: *id037
         - !!robotbuilder.data.CommandGroupEntry
-          command: *id039
+          command: *id038
           hasMatch: true
           order: Parallel
           parameters:
@@ -922,8 +922,18 @@ Children:
             value:
             - !!robotbuilder.data.properties.ValuedParameterDescriptor {name: timeout,
               type: double, value: '20'}
-          previous: *id040
-        - &id041 !!robotbuilder.data.CommandGroupEntry
+          previous: *id039
+        - &id040 !!robotbuilder.data.CommandGroupEntry
+          command: *id035
+          hasMatch: true
+          order: Sequential
+          parameters:
+            default: []
+            name: ParametersProperty
+            validators: null
+            value: []
+          previous: *id039
+        - !!robotbuilder.data.CommandGroupEntry
           command: *id036
           hasMatch: true
           order: Sequential
@@ -933,16 +943,6 @@ Children:
             validators: null
             value: []
           previous: *id040
-        - !!robotbuilder.data.CommandGroupEntry
-          command: *id037
-          hasMatch: true
-          order: Sequential
-          parameters:
-            default: []
-            name: ParametersProperty
-            validators: null
-            value: []
-          previous: *id041
       Button on SmartDashboard: !!robotbuilder.data.properties.BooleanProperty {default: true,
         name: Button on SmartDashboard, validators: null, value: true}
     Base: Command Group
@@ -992,7 +992,7 @@ Children:
     Base: Command
     Name: CatapultArmed
   - Children: []
-    Properties: *id042
+    Properties: *id041
     Base: Timed Command
     Name: CatapultLaunch
   - Children: []
