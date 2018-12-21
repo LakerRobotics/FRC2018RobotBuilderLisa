@@ -39,7 +39,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 			m_driveTrain = drivetrain;
 			m_TurnSource = turnSource;
 			
-			double slowRotation = m_targetAngle + 90;
+			double slowRotation = m_targetAngle + 90;// because we use motion control to start somewhere, and go to straight
 			WrapRotationPIDOutput wrappedRotationPIDOutput =  new WrapRotationPIDOutput(this);
 			
 			m_RotationController = createRotationPIDController(m_targetAngle, slowRotation, wrappedRotationPIDOutput);
@@ -77,8 +77,8 @@ import edu.wpi.first.wpilibj.PIDOutput;
 	    		motorPower = 1 - rotationPower;
 	    	}
 	    	
-	    	leftPower = motorPower-rotationPower;
-	    	rightPower = motorPower+rotationPower;
+	    	leftPower = motorPower+rotationPower;
+	    	rightPower = motorPower-rotationPower;
 	    	
 	    	m_driveTrain.tankDrive(leftPower * SPEED_MODIFIER,  rightPower * SPEED_MODIFIER);
 	    	
@@ -132,7 +132,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 
 	    }
 	    
-	    public void disableRotationController()
+	    public void disableRotationPIDController()
 	    {
 	    	m_RotationController.disable();
 	    	//m_RotationController.free();

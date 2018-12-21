@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class PIDOutputDriveTurn implements PIDOutput {
 
-	DriveTrainMotionControl m_DriveTrain;
+	protected DriveTrainMotionControl m_DriveTrain;
 	
 	public PIDOutputDriveTurn(DriveTrainMotionControl driveTrain) {
 	    SmartDashboard.putString("DriveSpinPIDOutput", "constructor called");

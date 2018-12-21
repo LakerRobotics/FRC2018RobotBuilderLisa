@@ -2,9 +2,7 @@ package org.usfirst.frc5053.RobotBuilderLisa.subsystems;
 
 import java.util.HashMap;
 
-import org.usfirst.frc5053.RobotBuilderLisa.subsystems.utilities.AnglePIDWrapper;
 import org.usfirst.frc5053.RobotBuilderLisa.subsystems.utilities.MotionController;
-import org.usfirst.frc5053.RobotBuilderLisa.subsystems.utilities.SwingPIDWrapper;
 
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.Encoder;
@@ -22,10 +20,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class DriveTrainMotionControl extends DifferentialDrive 
 {
-	/**
-	 * Hello There! : I'm the base constructor.
-	 */
-
 	private Encoder m_LeftEncoder;
 	private Encoder m_RightEncoder;
 	
@@ -38,8 +32,8 @@ public class DriveTrainMotionControl extends DifferentialDrive
 	// Normal PID stuff D:
 	PIDController m_AnglePID;
 	PIDController m_SwingPID;
-	AnglePIDWrapper m_AnglePIDWrapper;
-	private SwingPIDWrapper m_SwingPIDWrapper;
+
+//	private SwingPIDWrapper m_SwingPIDWrapper;
 	private double m_Speed = 0.0;
 	private double m_Turn = 0.0;
 	private double m_swingTurnValue = 0.0;
@@ -57,129 +51,108 @@ public class DriveTrainMotionControl extends DifferentialDrive
 		
 		m_Gyro = gyro;
 		
-		m_MotionController = new MotionController(this, (PIDSource) m_LeftEncoder, (PIDSource) m_Gyro);
+		PIDSource robotDistanceEncoders = new PIDSourceDistance(this);
 		
-		m_AnglePIDWrapper = new AnglePIDWrapper(this);
-		m_AnglePID = new PIDController(0.1, 0.0, 0.0, m_AnglePIDWrapper, m_AnglePIDWrapper);
-		m_AnglePID.setAbsoluteTolerance(2.5);
+		m_MotionController = new MotionController(this, robotDistanceEncoders , (PIDSource) m_Gyro);
 		
-		m_SwingPIDWrapper = new SwingPIDWrapper(this);
+
 		
-		m_SwingPID = new PIDController(0.07, 0.0, 0.0, m_SwingPIDWrapper, m_SwingPIDWrapper);
 		m_SwingPID.setOutputRange(-0.75, 0.75);
 		m_SwingPID.setAbsoluteTolerance(SWING_TOLERANCE);
 	}
 	
 	
 	
-	public void setAngle(double angle)
-	{
-		m_AnglePID.setSetpoint(90);
-	}
-	public void setTurn(double turn)
-	{
-		ArcadeDrive(m_Speed, turn);
-	}
-	public boolean isTurnPIDOnTarget()
-	{
-		return Math.abs(m_AnglePID.getSetpoint() - GetAngle()) < 2.5;
-	}
-	public boolean enableTurnPID()
-	{
-		if(!m_AnglePID.isEnabled())
-			m_AnglePID.enable();
-		
-		return m_AnglePID.isEnabled();
-	}
-	public boolean isTurnPIDEnabled()
-	{
-		return m_AnglePID.isEnabled();
-	}
-	public boolean disableTurnPID()
-	{
-		if(m_AnglePID.isEnabled())
-			m_AnglePID.disable();
-		
-		return !m_AnglePID.isEnabled();
-	}
-	
-	
-	
-	public void DriveDistance(double distance, double maxspeed, double ramp)
-	{
-		if(!isPIDRunning)
-		{
+
+	// Drive Straight
+	public void DriveDistance(double distance, double maxspeed, double ramp){
+		if(!isPIDRunning){
 			isPIDRunning = 	m_MotionController.ExecuteStraightMotion(distance, maxspeed, ramp);
 		}
-		
 	}
-	public void DriveControlledAngle(double distance, double maxspeed, double ramp, double angle)
-	{
+	public boolean isStraightPIDFinished(){
+		if(m_MotionController.isStraightMotionFinished()){
+			isPIDRunning = false;
+			return true;
+		}
+		return false;
+	}
+	
+	
+	public void DriveControlledAngle(double distance, double maxspeed, double ramp, double angle){
 		if(!isPIDRunning)
 			isPIDRunning = m_MotionController.ExecuteControlledAngleDriveMotion(distance, maxspeed, ramp, angle);
 	}
-	public void TurnToAngle(double turnAngle)
-	{
-		if(!isPIDRunning)
-		{
+	
+	// Turn (piorouete)
+	//=====================================
+	public void setAngle(double angle){
+		m_AnglePID.setSetpoint(90);
+	}
+	public void setTurn(double turn){
+		ArcadeDrive(m_Speed, turn);
+	}
+
+	public boolean enableTurnPID(){
+		if(!m_AnglePID.isEnabled())
+			m_AnglePID.enable();
+		return m_AnglePID.isEnabled();
+	}
+	public boolean isTurnPIDEnabled(){
+		return m_AnglePID.isEnabled();
+	}
+	public boolean disableTurnPID(){
+		if(m_AnglePID.isEnabled())
+			m_AnglePID.disable();
+		return !m_AnglePID.isEnabled();
+	}
+	public boolean isTurnPIDOnTarget(){
+		return Math.abs(m_AnglePID.getSetpoint() - GetAngle()) < 2.5;
+	}
+
+	public boolean isTurnPIDFinished() {
+		if(m_MotionController.isTurnMotionFinished()){
+			isPIDRunning = false;
+			return true;
+		}
+		return false;
+	}
+	public void TurnToAngle(double turnAngle){
+		if(!isPIDRunning){
 			isPIDRunning = m_MotionController.ExecuteTurnMotion(turnAngle);
 		}
-		
 	}
-	public void DriveInArc(double distance, double maxspeed, double ramp, double radius)
-	{
-		if(!isPIDRunning)
-		{
+	
+	/*
+	 * Drive on Arc
+	 * --------------------------------------------------------------------------------------------
+	 */
+	public void DriveInArc(double distance, double maxspeed, double ramp, double radius){
+		if(!isPIDRunning){
 			isPIDRunning = m_MotionController.ExecuteArcMotion(distance, maxspeed, ramp, radius);
 		}
 	}
-	public boolean isStraightPIDFinished()
-	{
-		if(m_MotionController.isStraightMotionFinished())
-		{
+	public boolean isArcPIDFinished(){
+		if(m_MotionController.isArcMotionFinished()){
 			isPIDRunning = false;
 			return true;
 		}
 		return false;
 	}
-	public boolean isTurnPIDFinished() 
-	{
-		if(m_MotionController.isTurnMotionFinished())
-		{
-			isPIDRunning = false;
-			return true;
-		}
-		return false;
-	}
-	public boolean isArcPIDFinished()
-	{
-		if(m_MotionController.isArcMotionFinished())
-		{
-			isPIDRunning = false;
-			return true;
-		}
-		return false;
-	}
-	public void DisablePIDControl()
-	{
+	
+	
+	public void DisablePIDControl(){
 		m_MotionController.DisablePIDControls();
 	}
-	public double GetRightDistance()
-	{
-		return m_RightEncoder.getDistance();
-	}
-	public double GetRightSpeed()
-	{
-		return m_RightEncoder.getRate();
-	}
-	public double GetLeftDistance()
-	{
-		return m_LeftEncoder.getDistance();
-	}
-	public double GetLeftSpeed()
-	{
-		return m_LeftEncoder.getRate();
-	}
+	
+	public double GetLeftDistance() { 	return m_LeftEncoder.getDistance();}
+	public double GetRightDistance(){ 	return m_RightEncoder.getDistance();}
+	public double GetAverageDistance(){	return -(-GetLeftDistance() + GetRightDistance())/2;}
+	
+	public double GetLeftSpeed(){		return m_LeftEncoder.getRate();}
+	public double GetRightSpeed(){    	return m_RightEncoder.getRate();}
+	public double GetAverageSpeed(){	return -(-GetLeftSpeed() + GetRightSpeed())/2;}
+
 	public void ResetEncoders()
 	{
 		m_LeftEncoder.reset();
@@ -189,97 +162,42 @@ public class DriveTrainMotionControl extends DifferentialDrive
 	{
 		m_Gyro.reset();
 	}
-	public double GetAverageSpeed()
-	{
-		return -(-GetLeftSpeed() + GetRightSpeed())/2;
-	}
-	public double GetAverageDistance()
-	{
-		return -(-GetLeftDistance() + GetRightDistance())/2;
-	}
-	public void ArcadeDrive(double speed, double angle)
-	{
+
+	public void ArcadeDrive(double speed, double angle){
 		this.m_Speed = speed;
 		this.m_Turn = angle;
 		
 		this.arcadeDrive(speed, angle);
 	}
+	
 	public double GetAngle()
 	{
+		//Store away the gyrotype (e.g. distance or speed, angle or Rev/min)
 		PIDSourceType gyroType = m_Gyro.getPIDSourceType();
+		
+		// force type to be distance, which in this case is an Angle mesurement
 		m_Gyro.setPIDSourceType(PIDSourceType.kDisplacement);
 		double angle = m_Gyro.getAngle();
+		
+		//return the Gyro to the original setting
 		m_Gyro.setPIDSourceType(gyroType);
+		
+		// return the angle
 		return angle;
 	}
-	public double getAngularVelocity()
-	{
+	public double getAngularVelocity(){
 		return m_Gyro.getRate();
 	}
-	public boolean StartSwingTurn() {
-		try {
-			if (!m_SwingPID.isEnabled()) {
-				m_SwingPID.enable();
-			}
-			return true;
-		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
-		}
-		return false;
-		
-	}
-	public boolean SetSwingParameters(double angle, boolean isRight) {
-		try {
-			m_SwingPID.setSetpoint(angle);
-			m_swingTurnRight = isRight;
-			
-			return true;
-		} catch (Exception ex) {
-			System.out.println(ex.getMessage());
-		}
-		return false;
-	}
-	public void SwingTurn(double turnSpeed) {
-		m_swingTurnValue = turnSpeed;
-		
-		System.out.println("Swing turn speed: " + turnSpeed);
-		
-		if (m_swingTurnRight) 
-		{
-			this.tankDrive(0, turnSpeed);
-		} 
-		else 
-		{
-			this.tankDrive(-turnSpeed, 0);
-		}
-	}
-	public boolean SwingAngleOnTarget()
-	{
-		if(Math.abs(GetSwingPIDSetpoint() - GetAngle()) < SWING_TOLERANCE)
-		{
-			return true;
-		} else return false;
-	}
-	double GetSwingPIDSetpoint()
-	{
-		return m_SwingPID.getSetpoint();
-	}
-	public boolean disableSwingPID()
-	{
-		if(m_SwingPID.isEnabled())
-			m_SwingPID.disable();
-		
-		return true;
-	}
-	public HashMap<String, Double> GetDashboardData() 
-	{
+	
+
+	
+	
+	public HashMap<String, Double> GetDashboardData() {
 		return null;
 		// TODO Auto-generated method stub
-		
 	}
 	
-	public void WriteDashboardData() 
-	{
+	public void WriteDashboardData() {
 		SmartDashboard.putNumber("Gyro Angle", m_Gyro.getAngle());
 		SmartDashboard.putNumber("Gyro Rate", m_Gyro.getRate());
 		SmartDashboard.putNumber("LeftDriveEncoder Rate", m_LeftEncoder.getRate());
