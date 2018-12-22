@@ -21,17 +21,13 @@ import edu.wpi.first.wpilibj.PIDOutput;
 	 */
 	public class PIDOutputStraightMotion implements PIDOutput {
 		
-		// This is just a simple P control, Proportional control of the line follow
-		// if we assume angle is in degrees and if we were off by 20 Degrees then we would want how much correction
-		// for example id Kp is 0.025 at 20 degrees we would have 0.5 or half the power toward rotating the robot 
-		private double Kp = 1d/200d; //0.025;// 
+
 		private DriveTrainMotionControl m_driveTrain;
 		private PIDSource m_TurnSource;
 		private double m_targetAngle = 0.0d;
 		private double rotationPower = 0.0d;
 		private MotionControlPIDController m_RotationController;
 		
-		private final double SPEED_MODIFIER = 1.00;
 
 		public PIDOutputStraightMotion(DriveTrainMotionControl drivetrain, PIDSource turnSource, double targetAngle) 
 		{
@@ -80,7 +76,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 	    	leftPower = motorPower+rotationPower;
 	    	rightPower = motorPower-rotationPower;
 	    	
-	    	m_driveTrain.tankDrive(leftPower * SPEED_MODIFIER,  rightPower * SPEED_MODIFIER);
+	    	m_driveTrain.tankDrive(leftPower ,  rightPower );
 	    	
 	    	//System.out.println("Left Power: " + leftPower);
 	    	//System.out.println("Right power: " + rightPower);
@@ -93,6 +89,10 @@ import edu.wpi.first.wpilibj.PIDOutput;
 		    double ramp 	=  30; //degrees
 		    double maxspeed = 10.0*(360/60) ; //60/360 converts the first numbers which is in RPM to degrees/second
 			
+			// This is just a simple P control, Proportional control of the line follow
+			// if we assume angle is in degrees and if we were off by 20 Degrees then we would want how much correction
+			// for example id Kp is 0.025 at 20 degrees we would have 0.5 or half the power toward rotating the robot 
+//			private double Kp = 1d/200d; //0.025;// 
 			final double Kp = 0.001; // so at denominator off in the spin-Rate the power will reach the max
 		    final double Ki = 0.0001;
 		    final double Kd = 0.0;
@@ -109,6 +109,12 @@ import edu.wpi.first.wpilibj.PIDOutput;
 		}
 		
 		
+	    public void disableRotationPIDController()
+	    {
+	    	m_RotationController.disable();
+	    	//m_RotationController.free();
+	    }
+	    
 	    private class WrapRotationPIDOutput implements PIDOutput 
 	    {
 
@@ -132,9 +138,5 @@ import edu.wpi.first.wpilibj.PIDOutput;
 
 	    }
 	    
-	    public void disableRotationPIDController()
-	    {
-	    	m_RotationController.disable();
-	    	//m_RotationController.free();
-	    }
+
 	}

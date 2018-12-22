@@ -23,7 +23,7 @@ public class MotionController
 	private MotionControlPIDController m_ArcDistancePIDController;
 	private PIDOutputArcMotion         m_ArcRotationPIDOutput;
 	
-	private double m_targetDistance;
+	private double m_DistanceToExceed;
 	private double m_targetAngle;
 	private double m_StraightTolerance;
 	private double m_TurnTolerance;
@@ -54,11 +54,11 @@ public class MotionController
 	
 	
 	
-	public MotionController(DriveTrainMotionControl driveTrainMotionControl, PIDSource distanceSource, PIDSource turnSource)
+	public MotionController(DriveTrainMotionControl driveTrainMotionControl, PIDSource distanceSource, PIDSource rotationSource)
 	{
 		m_DriveTrain = driveTrainMotionControl;
 		m_LineSource = distanceSource;
-		m_TurnSource = turnSource;
+		m_TurnSource = rotationSource;
 		
 		m_StraightDistancePIDController = null;
 		m_StraightRotationPIDOutput = null;
@@ -66,7 +66,7 @@ public class MotionController
 		m_TurnPIDController = null;
 		
 		
-		m_targetDistance = 0;
+		m_DistanceToExceed = 0;
 		m_targetAngle = 0;
 		m_StraightTolerance = 0.5;
 		m_TurnTolerance = 0.5;
@@ -89,7 +89,7 @@ public class MotionController
 		if (!m_PIDEnabled)
 		{
 			m_targetAngle =  targetAngle;
-			m_targetDistance = distance;
+			m_DistanceToExceed = distance;
 			m_DriveTrain.ResetEncoders();
 			
 			double start = 0;
@@ -98,7 +98,7 @@ public class MotionController
 			double convertedSpeed = maxspeed * 12; 	// Converted from Feet/Second to Inches/Second
 			double convertedRamp = ramp;			// Inches/Second
 			
-			if (!(Math.abs(m_DriveTrain.GetLeftDistance()) > Math.abs(m_targetDistance)))
+			if (!(Math.abs(m_DriveTrain.GetLeftDistance()) > Math.abs(m_DistanceToExceed)))
 			{
 				//Instantiates a new AdjustSpeedAsTravelMotionControlHelper() object for the driveStraightDistance we are going to traverse
 				m_StraightRotationPIDOutput = new PIDOutputStraightMotion(m_DriveTrain, m_TurnSource, m_targetAngle);
@@ -171,7 +171,7 @@ public class MotionController
 	 */
 	public boolean ExecuteArcMotion(double distance, double maxSpeed, double ramp, double radiusOfArc)
 	{
-		m_targetDistance = distance;
+		m_DistanceToExceed = distance;
 		m_DriveTrain.ResetEncoders();
 		
 		double start = 0;
@@ -219,13 +219,13 @@ public class MotionController
 		 * the return value indicates you can proceed to the next step.
 		 * */
 		SmartDashboard.putNumber("Distance Left", m_DriveTrain.GetLeftDistance());
-		SmartDashboard.putNumber("Target distance", m_targetDistance);
+		SmartDashboard.putNumber("Target distance", m_DistanceToExceed);
 		SmartDashboard.putNumber("Straight Tolerance", m_StraightTolerance);
 		
 		//TODO Verify this tolerance works... it should...
 		SmartDashboard.putNumber("Average Distance", m_DriveTrain.GetAverageDistance());
-		SmartDashboard.putNumber("Target", Math.abs(m_targetDistance - m_StraightTolerance));
-		if (Math.abs(m_DriveTrain.GetLeftDistance()) >= Math.abs(m_targetDistance - m_StraightTolerance))
+		SmartDashboard.putNumber("Target", Math.abs(m_DistanceToExceed - m_StraightTolerance));
+		if (Math.abs(m_DriveTrain.GetLeftDistance()) >= Math.abs(m_DistanceToExceed - m_StraightTolerance))
 		{
 			//Always tripped
 			if(m_StraightDistancePIDController != null) {
@@ -262,19 +262,31 @@ public class MotionController
 		 * the return value indicates you can proceed to the next step.
 		 * */
 		SmartDashboard.putNumber("Distance Left", m_DriveTrain.GetLeftDistance());
-		SmartDashboard.putNumber("Target distance", m_targetDistance);
-		SmartDashboard.putNumber("Straight Tolerance", m_StraightTolerance);
+		SmartDashboard.putNumber("Target distance", m_DistanceToExceed);
+//		SmartDashboard.putNumber("Straight Tolerance", m_StraightTolerance);
 		
-		//TODO Verify this tolerance works... it should...
-		if (Math.abs(m_DriveTrain.GetAverageDistance() - m_targetDistance) <= Math.abs(m_StraightTolerance))
-		{
-			//Always tripped
+		boolean didExceedDistance = false;
+		if(m_DriveTrain.GetAverageSpeed() >= 0) {
+			// Traveling Backwards
+			if (m_DriveTrain.GetAverageDistance() < m_DistanceToExceed) {
+				didExceedDistance = true;
+			}else {
+				didExceedDistance = false;
+			}
+		}else {
+			// Traveling forward
+			if (m_DriveTrain.GetAverageDistance() > m_DistanceToExceed) {
+				didExceedDistance = true;
+			}else {
+				didExceedDistance = false;
+			}
+		}
+		if(didExceedDistance) {
 			m_ArcDistancePIDController.disable();
-			
-//Dont stop, let motion flow to next if desired			m_DriveTrain.ArcadeDrive(0, 0);
 			m_PIDEnabled = false;
 			return true;
 		}
+        //Dont stop, let motion flow to next if desired			m_DriveTrain.ArcadeDrive(0, 0);
 		return false;
 	}
 
