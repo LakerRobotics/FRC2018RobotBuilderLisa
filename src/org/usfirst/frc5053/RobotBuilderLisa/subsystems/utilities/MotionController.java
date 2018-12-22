@@ -48,9 +48,12 @@ public class MotionController
 	private final double ArcKp = 0.002;
 	private final double ArcKi = 0.001;
 	private final double ArcKd = 0.0;
+	private final double arcMaxPower = 0.5;
 	
 	PIDSource m_LineSource;
 	PIDSource m_TurnSource;
+	
+	boolean isArcMovingForward = true;
 	
 	
 	
@@ -171,8 +174,14 @@ public class MotionController
 	 */
 	public boolean ExecuteArcMotion(double distance, double maxSpeed, double ramp, double radiusOfArc)
 	{
+		if(m_DistanceToExceed>0){
+			isArcMovingForward = true;
+		}
+		else {
+			isArcMovingForward = false;
+		}
 		m_DistanceToExceed = distance;
-		m_DriveTrain.ResetEncoders();
+//		m_DriveTrain.ResetEncoders();
 		
 		double start = 0;
 
@@ -189,7 +198,7 @@ public class MotionController
 //			m_StraightRotationPIDOutput = new PIDOutputStraightMotion(m_DriveTrain, m_TurnSource, m_targetAngle);
 //			m_AdustsSpeedAsTravelStraightHelper = new AdjustSpeedAsTravelMotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_StraightSource, m_StraightRotationPIDOutput);
 			// motionControlForwardSpeed
-			m_ArcRotationPIDOutput         = new PIDOutputArcMotion(m_DriveTrain, m_TurnSource, radiusOfArc/12);
+			m_ArcRotationPIDOutput         = new PIDOutputArcMotion(m_DriveTrain, m_TurnSource, radiusOfArc);
 			m_AdjustSpeedAsTravelArcHelper = new AdjustSpeedAsTravelMotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_LineSource, m_ArcRotationPIDOutput);
 			
 //			//Instantiates a new MotionControlPIDController() object for the new drive segment using the previous MotionControlHelper()
@@ -200,7 +209,7 @@ public class MotionController
 			//Instantiates a new MotionControlPIDController() object for the new turn segment using the previous MotionControlHelper()
 			m_ArcDistancePIDController = new MotionControlPIDController(ArcKp, ArcKi, ArcKd, m_AdjustSpeedAsTravelArcHelper);
 			m_ArcDistancePIDController.setAbsoluteTolerance(m_StraightTolerance);
-			m_ArcDistancePIDController.setOutputRange(-1.0, 1.0);
+			m_ArcDistancePIDController.setOutputRange(-arcMaxPower, arcMaxPower);
 			
 //			//Turns the MotionControlPID ON and it will continue to execute by itself until told otherwise.
 //			m_StraightDistancePIDController.enable();
@@ -261,26 +270,31 @@ public class MotionController
 		 * Called while waiting for the MotionControlPID to finish. The PID will be disabled when the end condition is met, and
 		 * the return value indicates you can proceed to the next step.
 		 * */
-		SmartDashboard.putNumber("Distance Left", m_DriveTrain.GetLeftDistance());
-		SmartDashboard.putNumber("Target distance", m_DistanceToExceed);
+		SmartDashboard.putNumber("Arc - Distance", m_DriveTrain.GetAverageDistance());
+		System.out.println("Arc - Distance = "+ m_DriveTrain.GetAverageDistance());
+		SmartDashboard.putNumber("ARc - Distance to Exceed", m_DistanceToExceed);
+		System.out.println("Arc - Distance to Exceed = "+ m_DistanceToExceed);
+		System.out.println("Arc - isArcMovingForward = "+ isArcMovingForward);
 //		SmartDashboard.putNumber("Straight Tolerance", m_StraightTolerance);
 		
 		boolean didExceedDistance = false;
-		if(m_DriveTrain.GetAverageSpeed() >= 0) {
-			// Traveling Backwards
-			if (m_DriveTrain.GetAverageDistance() < m_DistanceToExceed) {
-				didExceedDistance = true;
-			}else {
-				didExceedDistance = false;
-			}
-		}else {
-			// Traveling forward
+		if(isArcMovingForward) {
+			// Traveling Forward
 			if (m_DriveTrain.GetAverageDistance() > m_DistanceToExceed) {
 				didExceedDistance = true;
 			}else {
 				didExceedDistance = false;
 			}
+		}else {
+			// Traveling Backward
+			if (m_DriveTrain.GetAverageDistance() < m_DistanceToExceed) {
+				didExceedDistance = true;
+			}else {
+				didExceedDistance = false;
+			}
 		}
+		System.out.println("Arc - didExceedDistance = "+ didExceedDistance);
+		
 		if(didExceedDistance) {
 			m_ArcDistancePIDController.disable();
 			m_PIDEnabled = false;

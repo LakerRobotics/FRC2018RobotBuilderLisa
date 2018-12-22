@@ -8,6 +8,8 @@ import edu.wpi.first.wpilibj.PIDController;
 
 	import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
+
+ 
 	/**
 	 * 
 	 * @author Rich Topolewski
@@ -20,6 +22,10 @@ import edu.wpi.first.wpilibj.PIDController;
 	 *
 	 */
 	public class PIDOutputArcMotion implements PIDOutput {
+		final double Kp = 1d/200; // so at denominator off in the spin-Rate (RPMP the power will reach the max
+	    final double Ki = 0.000;
+	    final double Kd = 0.0;
+	    final double MaxRotationPower = 0.5;
 		//Gyro gyro = Robot.getRobotSensors().getGyro();
 		
 		// This is just a simple P control, Proportional control of the arc follow
@@ -27,7 +33,7 @@ import edu.wpi.first.wpilibj.PIDController;
 		// for example id Kp is 0.025 at 20 degrees we would have 0.5 or half the power toward rotating the robot 
 
 		private DriveTrainMotionControl m_RobotDrive;
-		private double Kp;
+//		private double Kp;
 		private PIDSource m_Gyro; 
 //		private double m_TargetAngle;
 		private double m_RotationPower;
@@ -35,6 +41,9 @@ import edu.wpi.first.wpilibj.PIDController;
 		private double m_ArcRadius;
 		PIDController m_ArcRotationSpeedPID;
 
+		/*
+		 * arcRadius in Inches
+		 */
 		public PIDOutputArcMotion(DriveTrainMotionControl drive, PIDSource anglePIDSource, double arcRadius) {
 			//SmartDashboard.putString("DriveSpinPIDOutput", "constructor called");
 			m_RobotDrive 	= drive;
@@ -42,7 +51,7 @@ import edu.wpi.first.wpilibj.PIDController;
 //			m_TargetAngle 	= Double.MAX_VALUE;
 			m_ArcRadius 	= arcRadius;
 			
-			Kp 				= 0d/20d; //0.025;//
+//			Kp 				= 0d/20d; //0.025;//
 //			m_TargetAngle 	= 0.0d;
 			m_RotationPower = 0.0d;
 			m_ForwardPower  = 0.0d;
@@ -93,19 +102,20 @@ import edu.wpi.first.wpilibj.PIDController;
 	    	SmartDashboard.putNumber("Arc - Rotational Power", m_RotationPower);
 	    	SmartDashboard.putNumber("Arc - Forward Power", forwardPower);
 	    	
-	    	leftPower = m_ForwardPower - m_RotationPower;
-	    	rightPower = m_ForwardPower + m_RotationPower;
+	    	leftPower = m_ForwardPower + m_RotationPower;
+	    	rightPower = m_ForwardPower - m_RotationPower;
 	    	
 	    	SmartDashboard.putNumber("Arc - Left Power Output", leftPower);
 	    	SmartDashboard.putNumber("Arc - Right Power Output", rightPower);
 	    	
-	    	double multiplier = 1.0;
+
 	    	
-	    	m_RobotDrive.tankDrive(leftPower * multiplier, rightPower * multiplier);
+	    	m_RobotDrive.tankDrive(-leftPower, -rightPower );
 
 		}
 		
 		private double getTargetRotationalSpeed(){
+			boolean debug = true;
 			//calculate the correct rotation speed based on the current speed of the robot.
 			//arched-turn for a robot in a big circle of radius R and it seems the the rate of angler change just needs to be proportional to the speed, to get a target R:
 			// RateAngularChange = 360*Speed/2pi*R,
@@ -113,17 +123,14 @@ import edu.wpi.first.wpilibj.PIDController;
 			//		 pi is the constant pi
 			//		 R is the Radius of the turn path we want the robot to take in ft.
 			double speed = m_RobotDrive.GetAverageSpeed();
+//			if (debug) print
 			double angularChangeSpeed = (speed * 360)/(2 * Math.PI * m_ArcRadius);
 			return angularChangeSpeed;
 		}	
 		
 		public  PIDController createArcPIDController(PIDSource rotationInput, PIDOutput rotationPowerOutput) {
 			
-			final double Kp = 1d/200; // so at denominator off in the spin-Rate the power will reach the max
-		    final double Ki = 0.0000;
-		    final double Kd = 0.0;
-		    final double MaxRotationPower = 1.0;
-		 
+
 
 		    
 		    // rotation speed proportional to the average speed of the wheels
