@@ -35,9 +35,9 @@ public class MotionController
 	private final double TurnKd = 0.0;
 	private final double TurnMaxPower = 0.75;
 	
-	private final double SwingKp = 0.07;
-	private final double SwingKi = 0.0;
-	private final double SwingKd = 0.0;
+//for ref	private final double SwingKp = 0.07;
+//for ref	private final double SwingKi = 0.0;
+//for ref	private final double SwingKd = 0.0;
 
 	
 	private final double StraightKp = 0.001;
@@ -45,15 +45,16 @@ public class MotionController
 	private final double StraightKd = 0.0;
 	private final double StraightMaxPower = 0.5;
 
-	private final double ArcKp = 0.002;
-	private final double ArcKi = 0.001;
-	private final double ArcKd = 0.0;
+	private final double ArcKp = StraightKp; //0.002;
+	private final double ArcKi = StraightKi; //0.001;
+	private final double ArcKd = StraightKd; //0.0;
 	private final double arcMaxPower = 0.5;
 	
 	PIDSource m_LineSource;
 	PIDSource m_TurnSource;
 	
 	boolean isArcMovingForward = true;
+	boolean isStraightMovingForward = true;
 	
 	
 	
@@ -180,7 +181,7 @@ public class MotionController
 		else {
 			isArcMovingForward = false;
 		}
-		m_DistanceToExceed = distance;
+		m_DistanceToExceed = distance;//inches
 //		m_DriveTrain.ResetEncoders();
 		
 		double start = 0;
@@ -188,7 +189,7 @@ public class MotionController
 		
 		if (!isPIDEnabled())
 		{
-			double convertedDistance = distance; 	// In inches
+			double convertedDistance = m_DistanceToExceed; 	// In inches
 			double convertedSpeed = maxSpeed * 12; 	// convert from feet to inches/second
 			double convertedRamp = ramp; 			// in inches
 			
@@ -234,14 +235,28 @@ public class MotionController
 		//TODO Verify this tolerance works... it should...
 		SmartDashboard.putNumber("Average Distance", m_DriveTrain.GetAverageDistance());
 		SmartDashboard.putNumber("Target", Math.abs(m_DistanceToExceed - m_StraightTolerance));
-		if (Math.abs(m_DriveTrain.GetLeftDistance()) >= Math.abs(m_DistanceToExceed - m_StraightTolerance))
-		{
-			//Always tripped
+
+		boolean didExceedDistance = false;
+		if(isStraightMovingForward) {
+			// Traveling Forward
+			if (m_DriveTrain.GetAverageDistance() > m_DistanceToExceed) {
+				didExceedDistance = true;
+			}else {
+				didExceedDistance = false;
+			}
+		}else {
+			// Traveling Backward
+			if (m_DriveTrain.GetAverageDistance() < m_DistanceToExceed) {
+				didExceedDistance = true;
+			}else {
+				didExceedDistance = false;
+			}
+		}
+		if(didExceedDistance){
 			if(m_StraightDistancePIDController != null) {
 				m_StraightDistancePIDController.disable();
 				m_StraightRotationPIDOutput.disableRotationPIDController();
 			}
-			//m_DriveTrain.ArcadeDrive(0, 0);
 			m_PIDEnabled = false;
 			return true;
 		}

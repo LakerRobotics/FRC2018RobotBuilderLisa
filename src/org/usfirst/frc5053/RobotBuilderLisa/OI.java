@@ -92,6 +92,9 @@ public class OI {
         SmartDashboard.putData("DriveTurn", new DriveTurn());
         SmartDashboard.putData("DriveTurnArc: Simple Test", new DriveTurnArc(72, 1, 48));
         SmartDashboard.putData("DriveTurnArc: TestTurnLeft", new DriveTurnArc(72, 1, -48));
+        SmartDashboard.putData("DriveTurnArc: GoCircle2ft", new DriveTurnArc(5000, 1, 24));
+        SmartDashboard.putData("DriveTurnArc: GoCirlce4ft", new DriveTurnArc(5000, 1, 48));
+        SmartDashboard.putData("DriveTurnArc: GoCirlce6ft", new DriveTurnArc(5000, 1, 72));
         SmartDashboard.putData("DriveSquare", new DriveSquare());
         SmartDashboard.putData("DriveTriangle", new DriveTriangle());
         SmartDashboard.putData("AutonTest", new AutonTest());
