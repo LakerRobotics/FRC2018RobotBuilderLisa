@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 	 */
 	public class PIDOutputStraightMotion implements PIDOutput {
 		
+		double maxRotationPower = 0.5;
 
 		private DriveTrainMotionControl m_driveTrain;
 		private PIDSource m_TurnSource;
@@ -102,7 +103,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 		    AdjustSpeedAsTravelHelper rotationSpeedProfile; 
 	        rotationSpeedProfile = new AdjustSpeedAsTravelMotionControlHelper(targetAngle, ramp, maxspeed, start, m_TurnSource, pidOutput);
 	        localRotationSpeedPID = new MotionControlPIDController(Kp,Ki,Kd, rotationSpeedProfile );
-	        localRotationSpeedPID.setOutputRange(-1.0, 1.0);
+	        localRotationSpeedPID.setOutputRange(-maxRotationPower, maxRotationPower);
 	        localRotationSpeedPID.setPID(Kp, Ki, Kd, 0);
 	        localRotationSpeedPID.enable();
 		    return localRotationSpeedPID;

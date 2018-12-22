@@ -43,7 +43,7 @@ public class MotionController
 	private final double StraightKp = 0.001;
 	private final double StraightKi = 0.0;
 	private final double StraightKd = 0.0;
-	private final double StraightMaxPower = 1.0;
+	private final double StraightMaxPower = 0.5;
 
 	private final double ArcKp = 0.002;
 	private final double ArcKi = 0.001;
@@ -232,7 +232,7 @@ public class MotionController
 				m_StraightDistancePIDController.disable();
 				m_StraightRotationPIDOutput.disableRotationPIDController();
 			}
-			m_DriveTrain.ArcadeDrive(0, 0);
+			//m_DriveTrain.ArcadeDrive(0, 0);
 			m_PIDEnabled = false;
 			return true;
 		}
@@ -248,7 +248,7 @@ public class MotionController
 		if (Math.abs(m_DriveTrain.GetAngle()-m_targetAngle) < m_TurnTolerance && Math.abs(m_DriveTrain.getAngularVelocity()) < m_AngularVelocityTolerance)
 		{
 			m_TurnPIDController.disable();
-			m_DriveTrain.ArcadeDrive(0, 0);
+			//m_DriveTrain.ArcadeDrive(0, 0);
 			m_PIDEnabled = false;
 			return true;
 		}

@@ -134,7 +134,7 @@ public class DriveTrainMotionControl extends DifferentialDrive
 	}
 
 	public void ArcadeDrive(double powerForward, double powerRotation){
-		this.arcadeDrive(powerForward, powerRotation);
+		this.arcadeDrive(powerForward, -powerRotation);
 	}
 	
 	public double GetAngle(){
