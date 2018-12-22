@@ -74,10 +74,10 @@ import edu.wpi.first.wpilibj.PIDOutput;
 	    		motorPower = 1 - rotationPower;
 	    	}
 	    	
-	    	leftPower = motorPower+rotationPower;
-	    	rightPower = motorPower-rotationPower;
+	    	leftPower = motorPower-rotationPower;
+	    	rightPower = motorPower+rotationPower;
 	    	
-	    	m_driveTrain.tankDrive(leftPower ,  rightPower );
+	    	m_driveTrain.tankDrive(-leftPower ,  -rightPower );
 	    	
 	    	//System.out.println("Left Power: " + leftPower);
 	    	//System.out.println("Right power: " + rightPower);
