@@ -3,24 +3,27 @@ package org.usfirst.frc5053.RobotBuilderLisa.subsystems.utilities;
 import org.usfirst.frc5053.RobotBuilderLisa.subsystems.DriveTrainMotionControl;
 import org.usfirst.frc5053.RobotBuilderLisa.subsystems.utilities.AdjustSpeedAsTravelMotionControlHelper;
 import org.usfirst.frc5053.RobotBuilderLisa.subsystems.utilities.MotionControlPIDController;
+
+import edu.wpi.first.wpilibj.PIDController;
 import edu.wpi.first.wpilibj.PIDSource;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class MotionController 
 {
 	private DriveTrainMotionControl m_DriveTrain;
-	private AdjustSpeedAsTravelHelper m_StraightControl;
-	private AdjustSpeedAsTravelMotionControlHelper m_TurnControl;
-	private AdjustSpeedAsTravelHelper m_ArcControl;
+	private AdjustSpeedAsTravelHelper m_AdustsSpeedAsTravelStraightHelper;
+	private AdjustSpeedAsTravelMotionControlHelper m_AdjustRpmAsTurnHelper;
+	private AdjustSpeedAsTravelHelper m_AdjustSpeedAsTravelArcHelper;
 	
-	private MotionControlPIDController m_StraightPIDController;
-	private PIDOutputStraightMotion m_StraightPIDOutput;
-	private PIDOutputControlledAngleDrive m_ControlledAngleDrivePIDOutput;
-	private MotionControlPIDController m_ControlledAngleDrivePIDController;
+	private MotionControlPIDController m_StraightDistancePIDController;
+	private PIDOutputStraightMotion    m_StraightRotationPIDOutput;
+	
 	private MotionControlPIDController m_TurnPIDController;
-	private MotionControlPIDController m_ArcPIDController;
 	
-	private double m_targetDistance;
+	private MotionControlPIDController m_ArcDistancePIDController;
+	private PIDOutputArcMotion         m_ArcRotationPIDOutput;
+	
+	private double m_DistanceToExceed;
 	private double m_targetAngle;
 	private double m_StraightTolerance;
 	private double m_TurnTolerance;
@@ -30,33 +33,40 @@ public class MotionController
 	private final double TurnKp = 0.0025;
 	private final double TurnKi = 0.0020;
 	private final double TurnKd = 0.0;
+	private final double TurnMaxPower = 0.75;
+	
+	private final double SwingKp = 0.07;
+	private final double SwingKi = 0.0;
+	private final double SwingKd = 0.0;
+
 	
 	private final double StraightKp = 0.001;
 	private final double StraightKi = 0.0;
 	private final double StraightKd = 0.0;
+	private final double StraightMaxPower = 0.5;
 
-	private final double ArcKp = 0.001;
-	private final double ArcKi = 0.0;
+	private final double ArcKp = 0.002;
+	private final double ArcKi = 0.001;
 	private final double ArcKd = 0.0;
 	
-	PIDSource m_StraightSource;
+	PIDSource m_LineSource;
 	PIDSource m_TurnSource;
 	
 	
 	
-	public MotionController(DriveTrainMotionControl driveTrainMotionControl, PIDSource straightSource, PIDSource turnSource)
+	public MotionController(DriveTrainMotionControl driveTrainMotionControl, PIDSource distanceSource, PIDSource rotationSource)
 	{
 		m_DriveTrain = driveTrainMotionControl;
-		m_StraightSource = straightSource;
-		m_TurnSource = turnSource;
+		m_LineSource = distanceSource;
+		m_TurnSource = rotationSource;
 		
-		m_StraightPIDController = null;
-		m_StraightPIDOutput = null;
-		m_ControlledAngleDrivePIDOutput = null;
+		m_StraightDistancePIDController = null;
+		m_StraightRotationPIDOutput = null;
+//		m_ControlledAngleDrivePIDOutput = null;
 		m_TurnPIDController = null;
 		
 		
-		m_targetDistance = 0;
+		m_DistanceToExceed = 0;
 		m_targetAngle = 0;
 		m_StraightTolerance = 0.5;
 		m_TurnTolerance = 0.5;
@@ -64,12 +74,22 @@ public class MotionController
 		m_PIDEnabled = false;
 		
 	}
-	public boolean ExecuteStraightMotion(double distance, double maxspeed, double ramp)
+	
+	public boolean ExecuteStraightMotion(double distance, double maxspeed, double ramp) {
+		double targetAngle = m_DriveTrain.GetAngle();
+		return ExecuteStraightMotionProvideAngle( distance,  maxspeed,  ramp, targetAngle);
+	}
+
+	public boolean ExecuteControlledAngleDriveMotion(double distance, double maxspeed, double ramp, double targetAngle) {
+		return ExecuteStraightMotionProvideAngle( distance,  maxspeed,  ramp, targetAngle);
+	}
+	
+	private boolean ExecuteStraightMotionProvideAngle(double distance, double maxspeed, double ramp, double targetAngle)
 	{
 		if (!m_PIDEnabled)
 		{
-			m_targetAngle = m_DriveTrain.GetAngle();
-			m_targetDistance = distance;
+			m_targetAngle =  targetAngle;
+			m_DistanceToExceed = distance;
 			m_DriveTrain.ResetEncoders();
 			
 			double start = 0;
@@ -78,19 +98,19 @@ public class MotionController
 			double convertedSpeed = maxspeed * 12; 	// Converted from Feet/Second to Inches/Second
 			double convertedRamp = ramp;			// Inches/Second
 			
-			if (!(Math.abs(m_DriveTrain.GetLeftDistance()) > Math.abs(m_targetDistance)))
+			if (!(Math.abs(m_DriveTrain.GetLeftDistance()) > Math.abs(m_DistanceToExceed)))
 			{
-				//Instantiates a new MotionControlHelper() object for the new drive segment
-				m_StraightPIDOutput = new PIDOutputStraightMotion(m_DriveTrain, m_TurnSource, m_targetAngle);
-				m_StraightControl = new AdjustSpeedAsTravelMotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_StraightSource, m_StraightPIDOutput);
+				//Instantiates a new AdjustSpeedAsTravelMotionControlHelper() object for the driveStraightDistance we are going to traverse
+				m_StraightRotationPIDOutput = new PIDOutputStraightMotion(m_DriveTrain, m_TurnSource, m_targetAngle);
+				m_AdustsSpeedAsTravelStraightHelper = new AdjustSpeedAsTravelMotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_LineSource, m_StraightRotationPIDOutput);
 				
 				//Instantiates a new MotionControlPIDController() object for the new drive segment using the previous MotionControlHelper()
-				m_StraightPIDController = new MotionControlPIDController(StraightKp, StraightKi, StraightKd, m_StraightControl);
-				m_StraightPIDController.setAbsoluteTolerance(m_StraightTolerance);
-				m_StraightPIDController.setOutputRange(-1.0, 1.0);
+				m_StraightDistancePIDController = new MotionControlPIDController(StraightKp, StraightKi, StraightKd, m_AdustsSpeedAsTravelStraightHelper);
+				m_StraightDistancePIDController.setAbsoluteTolerance(m_StraightTolerance);
+				m_StraightDistancePIDController.setOutputRange(-StraightMaxPower, StraightMaxPower);
 				
 				//Turns the MotionControlPID ON and it will continue to execute by itself until told otherwise.
-				m_StraightPIDController.enable();
+				m_StraightDistancePIDController.enable();
 				m_PIDEnabled = true;
 				return true;
 			}
@@ -98,8 +118,11 @@ public class MotionController
 		}
 		return true;
 	}
+	
 	public boolean ExecuteTurnMotion(double turnAngle)
 	{
+		//TODO to really have it turn on a Dime should monitor left to right wheel and make sure adding them goes to Zero
+		// create a forward motion PID control on that then you can get precise turning.
 		if (!m_PIDEnabled)
 		{
 			m_DriveTrain.ResetGyro();
@@ -115,13 +138,14 @@ public class MotionController
 			
 			if (!(Math.abs(m_DriveTrain.GetAngle()-m_targetAngle) < m_TurnTolerance))
 			{
+				
 				//Instantiates a new MotionControlHelper() object for the new turn segment
-				m_TurnControl = new AdjustSpeedAsTravelMotionControlHelper(m_targetAngle, ramp, maxSpeed, start, m_TurnSource, new PIDOutputDriveTurn(m_DriveTrain));
+				m_AdjustRpmAsTurnHelper = new AdjustSpeedAsTravelMotionControlHelper(m_targetAngle, ramp, maxSpeed, start, m_TurnSource, new PIDOutputDriveTurn(m_DriveTrain));
 //DontThinkNeeded				m_TurnControl.setTargetDistance(m_targetAngle);
 				
 				//Instantiates a new MotionControlPIDController() object for the new turn segment using the previous MotionControlHelper()
-				m_TurnPIDController = new MotionControlPIDController(TurnKp, TurnKi, TurnKd, m_TurnControl);
-				m_TurnPIDController.setOutputRange(-0.75, 0.75);
+				m_TurnPIDController = new MotionControlPIDController(TurnKp, TurnKi, TurnKd, m_AdjustRpmAsTurnHelper);
+				m_TurnPIDController.setOutputRange(-TurnMaxPower, TurnMaxPower);
 				
 				//Turns the MotionControlPID ON and it will continue to execute by itself until told otherwise.
 				m_TurnPIDController.enable();	
@@ -134,40 +158,9 @@ public class MotionController
 		return true;
 	}
 	
-	public boolean ExecuteControlledAngleDriveMotion(double distance, double maxspeed, double ramp, double angle)
-	{
-		if (!m_PIDEnabled)
-		{
-			m_targetAngle = angle;
-			m_targetDistance = distance;
-			m_DriveTrain.ResetEncoders();
-			
-			double start = 0;
-			
-			double convertedDistance = distance;	// Inches
-			double convertedSpeed = maxspeed * 12; 	// Converted from Feet/Second to Inches/Second
-			double convertedRamp = ramp;			// Inches/Second
-			
-			if (!(Math.abs(m_DriveTrain.GetLeftDistance()) > Math.abs(m_targetDistance)))
-			{
-				//Instantiates a new MotionControlHelper() object for the new drive segment
-				m_ControlledAngleDrivePIDOutput = new PIDOutputControlledAngleDrive(m_DriveTrain, m_TurnSource, m_targetAngle);
-				m_StraightControl = new AdjustSpeedAsTravelMotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_StraightSource, m_ControlledAngleDrivePIDOutput);
-				
-				//Instantiates a new MotionControlPIDController() object for the new drive segment using the previous MotionControlHelper()
-				m_ControlledAngleDrivePIDController = new MotionControlPIDController(StraightKp, StraightKi, StraightKd, m_StraightControl);
-				m_ControlledAngleDrivePIDController.setAbsoluteTolerance(m_StraightTolerance);
-				m_ControlledAngleDrivePIDController.setOutputRange(-1.0, 1.0);
-				
-				//Turns the MotionControlPID ON and it will continue to execute by itself until told otherwise.
-				m_ControlledAngleDrivePIDController.enable();
-				m_PIDEnabled = true;
-				return true;
-			}
-			return false;
-		}
-		return true;
-	}
+
+
+	
 	/**
 	 * 
 	 * @param distance  to travel in inches
@@ -178,12 +171,11 @@ public class MotionController
 	 */
 	public boolean ExecuteArcMotion(double distance, double maxSpeed, double ramp, double radiusOfArc)
 	{
-		m_targetDistance = distance;
+		m_DistanceToExceed = distance;
 		m_DriveTrain.ResetEncoders();
 		
 		double start = 0;
 
-		PIDOutputArcMotion motionControlArc;
 		
 		if (!isPIDEnabled())
 		{
@@ -191,18 +183,30 @@ public class MotionController
 			double convertedSpeed = maxSpeed * 12; 	// convert from feet to inches/second
 			double convertedRamp = ramp; 			// in inches
 			
-			motionControlArc = new PIDOutputArcMotion(m_DriveTrain, m_TurnSource, radiusOfArc/12);
 
-			//Instantiates a new MotionControlHelper() object for the new Arch segment
+//			//Instantiates a new MotionControlHelper() object for the new Arch segment
+//			//Instantiates a new AdjustSpeedAsTravelMotionControlHelper() object for the driveStraightDistance we are going to traverse
+//			m_StraightRotationPIDOutput = new PIDOutputStraightMotion(m_DriveTrain, m_TurnSource, m_targetAngle);
+//			m_AdustsSpeedAsTravelStraightHelper = new AdjustSpeedAsTravelMotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_StraightSource, m_StraightRotationPIDOutput);
 			// motionControlForwardSpeed
-			m_ArcControl = new AdjustSpeedAsTravelMotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_StraightSource, motionControlArc);
+			m_ArcRotationPIDOutput         = new PIDOutputArcMotion(m_DriveTrain, m_TurnSource, radiusOfArc/12);
+			m_AdjustSpeedAsTravelArcHelper = new AdjustSpeedAsTravelMotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_LineSource, m_ArcRotationPIDOutput);
 			
+//			//Instantiates a new MotionControlPIDController() object for the new drive segment using the previous MotionControlHelper()
+//			m_StraightDistancePIDController = new MotionControlPIDController(StraightKp, StraightKi, StraightKd, m_AdustsSpeedAsTravelStraightHelper);
+//			m_StraightDistancePIDController.setAbsoluteTolerance(m_StraightTolerance);
+//			m_StraightDistancePIDController.setOutputRange(-StraightMaxPower, StraightMaxPower);
+//			
 			//Instantiates a new MotionControlPIDController() object for the new turn segment using the previous MotionControlHelper()
-			m_ArcPIDController = new MotionControlPIDController(ArcKp, ArcKi, ArcKd, m_ArcControl);
-			m_ArcPIDController.setOutputRange(-1.0, 1.0);
+			m_ArcDistancePIDController = new MotionControlPIDController(ArcKp, ArcKi, ArcKd, m_AdjustSpeedAsTravelArcHelper);
+			m_ArcDistancePIDController.setAbsoluteTolerance(m_StraightTolerance);
+			m_ArcDistancePIDController.setOutputRange(-1.0, 1.0);
 			
-			//Turns the MotionControlPID ON and it will continue to execute by itself until told otherwise.
-			m_ArcPIDController.enable();
+//			//Turns the MotionControlPID ON and it will continue to execute by itself until told otherwise.
+//			m_StraightDistancePIDController.enable();
+//			m_PIDEnabled = true;
+			//Turns the MotionControlPID ON and it will continue to execute on a seperate thread by itself until told otherwise.
+			m_ArcDistancePIDController.enable();
 			return true;
 		}
 		return true;
@@ -215,20 +219,20 @@ public class MotionController
 		 * the return value indicates you can proceed to the next step.
 		 * */
 		SmartDashboard.putNumber("Distance Left", m_DriveTrain.GetLeftDistance());
-		SmartDashboard.putNumber("Target distance", m_targetDistance);
+		SmartDashboard.putNumber("Target distance", m_DistanceToExceed);
 		SmartDashboard.putNumber("Straight Tolerance", m_StraightTolerance);
 		
 		//TODO Verify this tolerance works... it should...
 		SmartDashboard.putNumber("Average Distance", m_DriveTrain.GetAverageDistance());
-		SmartDashboard.putNumber("Target", Math.abs(m_targetDistance - m_StraightTolerance));
-		if (Math.abs(m_DriveTrain.GetLeftDistance()) >= Math.abs(m_targetDistance - m_StraightTolerance))
+		SmartDashboard.putNumber("Target", Math.abs(m_DistanceToExceed - m_StraightTolerance));
+		if (Math.abs(m_DriveTrain.GetLeftDistance()) >= Math.abs(m_DistanceToExceed - m_StraightTolerance))
 		{
 			//Always tripped
-			if(m_StraightPIDController != null)
-				m_StraightPIDController.disable();
-			if(m_ControlledAngleDrivePIDController != null)
-				m_ControlledAngleDrivePIDController.disable();
-			m_DriveTrain.ArcadeDrive(0, 0);
+			if(m_StraightDistancePIDController != null) {
+				m_StraightDistancePIDController.disable();
+				m_StraightRotationPIDOutput.disableRotationPIDController();
+			}
+			//m_DriveTrain.ArcadeDrive(0, 0);
 			m_PIDEnabled = false;
 			return true;
 		}
@@ -244,7 +248,7 @@ public class MotionController
 		if (Math.abs(m_DriveTrain.GetAngle()-m_targetAngle) < m_TurnTolerance && Math.abs(m_DriveTrain.getAngularVelocity()) < m_AngularVelocityTolerance)
 		{
 			m_TurnPIDController.disable();
-			m_DriveTrain.ArcadeDrive(0, 0);
+			//m_DriveTrain.ArcadeDrive(0, 0);
 			m_PIDEnabled = false;
 			return true;
 		}
@@ -258,18 +262,31 @@ public class MotionController
 		 * the return value indicates you can proceed to the next step.
 		 * */
 		SmartDashboard.putNumber("Distance Left", m_DriveTrain.GetLeftDistance());
-		SmartDashboard.putNumber("Target distance", m_targetDistance);
-		SmartDashboard.putNumber("Straight Tolerance", m_StraightTolerance);
+		SmartDashboard.putNumber("Target distance", m_DistanceToExceed);
+//		SmartDashboard.putNumber("Straight Tolerance", m_StraightTolerance);
 		
-		//TODO Verify this tolerance works... it should...
-		if (Math.abs(m_DriveTrain.GetAverageDistance() - m_targetDistance) <= Math.abs(m_StraightTolerance))
-		{
-			//Always tripped
-			m_ArcPIDController.disable();
-//Dont stop, let motion flow to next if desired			m_DriveTrain.ArcadeDrive(0, 0);
+		boolean didExceedDistance = false;
+		if(m_DriveTrain.GetAverageSpeed() >= 0) {
+			// Traveling Backwards
+			if (m_DriveTrain.GetAverageDistance() < m_DistanceToExceed) {
+				didExceedDistance = true;
+			}else {
+				didExceedDistance = false;
+			}
+		}else {
+			// Traveling forward
+			if (m_DriveTrain.GetAverageDistance() > m_DistanceToExceed) {
+				didExceedDistance = true;
+			}else {
+				didExceedDistance = false;
+			}
+		}
+		if(didExceedDistance) {
+			m_ArcDistancePIDController.disable();
 			m_PIDEnabled = false;
 			return true;
 		}
+        //Dont stop, let motion flow to next if desired			m_DriveTrain.ArcadeDrive(0, 0);
 		return false;
 	}
 
@@ -285,20 +302,15 @@ public class MotionController
 			m_TurnPIDController.disable();
 		}
 		
-		if(m_StraightPIDController != null)
+		if(m_StraightDistancePIDController != null)
 		{
-			m_StraightPIDController.disable();
-			m_StraightPIDOutput.disableRotationController();
+			m_StraightDistancePIDController.disable();
+			m_StraightRotationPIDOutput.disableRotationPIDController();
 		}
 		
-		if(m_ControlledAngleDrivePIDController != null)
-		{
-			m_ControlledAngleDrivePIDController.disable();
-			m_ControlledAngleDrivePIDOutput.disableRotationController();
-		}
-		
-		if(m_ArcPIDController != null) {
-			m_ArcPIDController.disable();
+		if(m_ArcDistancePIDController != null) {
+			m_ArcDistancePIDController.disable();
+			//TODO
 		}
 		
 	}
