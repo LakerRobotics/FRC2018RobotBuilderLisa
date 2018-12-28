@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 	 */
 	public class PIDOutputStraightMotion implements PIDOutput {
 		
-		double maxRotationPower = 0.5;
+		double maxRotationPower = 1;
 
 		private DriveTrainMotionControl m_driveTrain;
 		private PIDSource m_TurnSource;
@@ -88,7 +88,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 		{
 			
 		    double ramp 	=  30; //degrees
-		    double maxspeed = 10.0*(360/60) ; //60/360 converts the first numbers which is in RPM to degrees/second
+		    double maxspeed = 20.0*(360/60) ; //60/360 converts the first numbers which is in RPM to degrees/second
 			
 			// This is just a simple P control, Proportional control of the line follow
 			// if we assume angle is in degrees and if we were off by 20 Degrees then we would want how much correction

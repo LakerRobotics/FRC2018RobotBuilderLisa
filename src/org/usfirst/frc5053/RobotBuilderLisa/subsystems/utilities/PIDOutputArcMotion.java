@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj.PIDController;
 	 *
 	 */
 	public class PIDOutputArcMotion implements PIDOutput {
-		final double Kp = 0.0025;//1/200; // so at denominator off in the spin-Rate (RPMP the power will reach the max
+		final double Kp = 0.05;//1/200; // so at denominator off in the spin-Rate (RPMP the power will reach the max
 	    final double Ki = 0.000;
 	    final double Kd = 0.0;
 	    final double MaxRotationPower = 0.5;
