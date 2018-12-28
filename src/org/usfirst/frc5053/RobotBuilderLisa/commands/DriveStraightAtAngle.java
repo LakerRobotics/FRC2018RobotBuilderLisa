@@ -44,7 +44,7 @@ public class DriveStraightAtAngle extends Command {
     // Called just before this Command runs the first time
     @Override
     protected void initialize() {
-		Robot.driveTrain.the_driveTrainMotionControl.DriveControlledAngle(m_Distance, m_MaxSpeed, 3, m_Angle);
+		Robot.driveTrain.the_driveTrainMotionControl.DriveControlledAngle(m_Distance, m_MaxSpeed, 0.5, m_Angle);
     }
 
     // Called repeatedly when this Command is scheduled to run

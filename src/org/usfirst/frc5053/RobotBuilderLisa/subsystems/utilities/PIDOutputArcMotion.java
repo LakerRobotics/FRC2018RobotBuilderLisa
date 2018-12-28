@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj.PIDController;
 	 *
 	 */
 	public class PIDOutputArcMotion implements PIDOutput {
-		final double Kp = 1d/200; // so at denominator off in the spin-Rate (RPMP the power will reach the max
+		final double Kp = 0.05;//1/200; // so at denominator off in the spin-Rate (RPMP the power will reach the max
 	    final double Ki = 0.000;
 	    final double Kd = 0.0;
 	    final double MaxRotationPower = 0.5;
@@ -117,11 +117,14 @@ import edu.wpi.first.wpilibj.PIDController;
 		private double getTargetRotationalSpeed(){
 			boolean debug = true;
 			//calculate the correct rotation speed based on the current speed of the robot.
-			//arched-turn for a robot in a big circle of radius R and it seems the the rate of angler change just needs to be proportional to the speed, to get a target R:
+			//arched-turn for a robot in a big circle of radius R and 
+			//  it seems the the rate of angler change just needs to be proportional to the speed,
+			//  to get a target R circle:
 			// RateAngularChange = 360*Speed/2pi*R,
-			//		 where: Speed is the speed of the robot in ft/sec
+			//		 where: Speed is the speed of the robot in in/sec
 			//		 pi is the constant pi
-			//		 R is the Radius of the turn path we want the robot to take in ft.
+			//		 R is the Radius of the turn path we want the robot to take in inches
+			//       360 is number of degrees in full circle.
 			double speed = m_RobotDrive.GetAverageSpeed();
 //			if (debug) print
 			double angularChangeSpeed = (speed * 360)/(2 * Math.PI * m_ArcRadius);

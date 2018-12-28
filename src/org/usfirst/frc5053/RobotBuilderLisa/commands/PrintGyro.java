@@ -45,8 +45,10 @@ public class PrintGyro extends Command {
     // Called repeatedly when this Command is scheduled to run
     @Override
     protected void execute() {
-    	System.out.println("Gyro.getAngle()="+RobotMap.gyro.getAngle());
-		SmartDashboard.putNumber("Gyro.getAngle()",RobotMap.gyro.getAngle()); 
+    	System.out.println("Gyro.getAngle()="+RobotMap.gyro.getAngle()+", Gyro.getRate()="+RobotMap.gyro.getRate());
+    	
+    	SmartDashboard.putNumber("Gyro.getAngle()",RobotMap.gyro.getAngle()); 
+		SmartDashboard.putNumber("Gyro.getRate()",RobotMap.gyro.getRate()); 
     }
 
     // Make this return true when this Command no longer needs to run execute()

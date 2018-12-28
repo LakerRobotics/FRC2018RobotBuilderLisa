@@ -45,7 +45,7 @@ public class DriveTurnArc extends Command {
     @Override
     protected void initialize() {
 //    	Robot.driveTrain.the_driveTrainMotionControl.ResetGyro();//TODO ELiminate the zeroing of the Gyro (move this to the calling program
-    	Robot.driveTrain.the_driveTrainMotionControl.DriveInArc(m_distance/* distance in*/, m_maxSpeed /*maxspeed ft/sec*/, 4 /*ramp in*/, m_Radius /*radius*/);
+    	Robot.driveTrain.the_driveTrainMotionControl.DriveInArc(m_distance/* distance in*/, m_maxSpeed /*maxspeed ft/sec*/, 0.5 /*ramp in*/, m_Radius /*radius*/);
     }
 
     // Called repeatedly when this Command is scheduled to run

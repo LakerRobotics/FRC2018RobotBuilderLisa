@@ -30,30 +30,31 @@ public class MotionController
 	private double m_AngularVelocityTolerance;
 	private boolean m_PIDEnabled;
 	
-	private final double TurnKp = 0.0025;
+	private final double TurnKp = 0.005;
 	private final double TurnKi = 0.0020;
 	private final double TurnKd = 0.0;
-	private final double TurnMaxPower = 0.75;
+	private final double TurnMaxPower = 1;
 	
-	private final double SwingKp = 0.07;
-	private final double SwingKi = 0.0;
-	private final double SwingKd = 0.0;
+//for ref	private final double SwingKp = 0.07;
+//for ref	private final double SwingKi = 0.0;
+//for ref	private final double SwingKd = 0.0;
 
 	
 	private final double StraightKp = 0.001;
 	private final double StraightKi = 0.0;
 	private final double StraightKd = 0.0;
-	private final double StraightMaxPower = 0.5;
+	private final double StraightMaxPower = 1;
 
-	private final double ArcKp = 0.002;
-	private final double ArcKi = 0.001;
-	private final double ArcKd = 0.0;
+	private final double ArcKp = StraightKp; //0.002;
+	private final double ArcKi = StraightKi; //0.001;
+	private final double ArcKd = StraightKd; //0.0;
 	private final double arcMaxPower = 0.5;
 	
 	PIDSource m_LineSource;
 	PIDSource m_TurnSource;
 	
 	boolean isArcMovingForward = true;
+	boolean isStraightMovingForward = true;
 	
 	
 	
@@ -72,7 +73,8 @@ public class MotionController
 		m_DistanceToExceed = 0;
 		m_targetAngle = 0;
 		m_StraightTolerance = 0.5;
-		m_TurnTolerance = 0.5;
+		m_TurnTolerance = 5;// had been 0.5
+		
 		m_AngularVelocityTolerance = 15;
 		m_PIDEnabled = false;
 		
@@ -122,22 +124,23 @@ public class MotionController
 		return true;
 	}
 	
-	public boolean ExecuteTurnMotion(double turnAngle)
+	public boolean ExecuteTurnMotion(double turnToAngle)
 	{
 		//TODO to really have it turn on a Dime should monitor left to right wheel and make sure adding them goes to Zero
 		// create a forward motion PID control on that then you can get precise turning.
 		if (!m_PIDEnabled)
 		{
-			m_DriveTrain.ResetGyro();
+//			m_DriveTrain.ResetGyro();
+			double start = m_DriveTrain.GetAngle();
 			
 			//TODO Magic numbers need fixing
 			//TODO What are the units?
-			double maxRPM = 15/*30*/;			// Rotations/Minute
-			double ramp = 30/* 3.5 * maxRPM*/;	// I guess its also rotations per minute?
+			double maxRPM = 60/*30*/;			// Rotations/Minute
+			double ramp = 45/* 3.5 * maxRPM*/;	//angle off from target to start slowing down.
 			
 			double maxSpeed = maxRPM * 6; // 360 Degrees/60 seconds to convert RPM to speed or degrees per second
-			double start = m_DriveTrain.GetAngle();
-			m_targetAngle = turnAngle + start;
+			m_targetAngle = turnToAngle;
+//			+ start;
 			
 			if (!(Math.abs(m_DriveTrain.GetAngle()-m_targetAngle) < m_TurnTolerance))
 			{
@@ -174,13 +177,14 @@ public class MotionController
 	 */
 	public boolean ExecuteArcMotion(double distance, double maxSpeed, double ramp, double radiusOfArc)
 	{
+		//TODO have it pay attention to current position and calc based on the differance
 		if(m_DistanceToExceed>0){
 			isArcMovingForward = true;
 		}
 		else {
 			isArcMovingForward = false;
 		}
-		m_DistanceToExceed = distance;
+		m_DistanceToExceed = distance;//inches
 //		m_DriveTrain.ResetEncoders();
 		
 		double start = 0;
@@ -188,7 +192,7 @@ public class MotionController
 		
 		if (!isPIDEnabled())
 		{
-			double convertedDistance = distance; 	// In inches
+			double convertedDistance = m_DistanceToExceed; 	// In inches
 			double convertedSpeed = maxSpeed * 12; 	// convert from feet to inches/second
 			double convertedRamp = ramp; 			// in inches
 			
@@ -234,14 +238,28 @@ public class MotionController
 		//TODO Verify this tolerance works... it should...
 		SmartDashboard.putNumber("Average Distance", m_DriveTrain.GetAverageDistance());
 		SmartDashboard.putNumber("Target", Math.abs(m_DistanceToExceed - m_StraightTolerance));
-		if (Math.abs(m_DriveTrain.GetLeftDistance()) >= Math.abs(m_DistanceToExceed - m_StraightTolerance))
-		{
-			//Always tripped
+
+		boolean didExceedDistance = false;
+		if(isStraightMovingForward) {
+			// Traveling Forward
+			if (m_DriveTrain.GetAverageDistance() > m_DistanceToExceed) {
+				didExceedDistance = true;
+			}else {
+				didExceedDistance = false;
+			}
+		}else {
+			// Traveling Backward
+			if (m_DriveTrain.GetAverageDistance() < m_DistanceToExceed) {
+				didExceedDistance = true;
+			}else {
+				didExceedDistance = false;
+			}
+		}
+		if(didExceedDistance){
 			if(m_StraightDistancePIDController != null) {
 				m_StraightDistancePIDController.disable();
 				m_StraightRotationPIDOutput.disableRotationPIDController();
 			}
-			//m_DriveTrain.ArcadeDrive(0, 0);
 			m_PIDEnabled = false;
 			return true;
 		}

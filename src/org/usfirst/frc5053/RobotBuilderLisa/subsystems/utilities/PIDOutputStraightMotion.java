@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 	 */
 	public class PIDOutputStraightMotion implements PIDOutput {
 		
-		double maxRotationPower = 0.5;
+		double maxRotationPower = 1;
 
 		private DriveTrainMotionControl m_driveTrain;
 		private PIDSource m_TurnSource;
@@ -88,12 +88,13 @@ import edu.wpi.first.wpilibj.PIDOutput;
 		{
 			
 		    double ramp 	=  30; //degrees
-		    double maxspeed = 10.0*(360/60) ; //60/360 converts the first numbers which is in RPM to degrees/second
+		    double maxspeed = 20.0*(360/60) ; //60/360 converts the first numbers which is in RPM to degrees/second
 			
 			// This is just a simple P control, Proportional control of the line follow
 			// if we assume angle is in degrees and if we were off by 20 Degrees then we would want how much correction
 			// for example id Kp is 0.025 at 20 degrees we would have 0.5 or half the power toward rotating the robot 
 //			private double Kp = 1d/200d; //0.025;// 
+		    //TODO change Kp to 1/20 or 0.025 so it is better at staying on the line.
 			final double Kp = 0.001; // so at denominator off in the spin-Rate the power will reach the max
 		    final double Ki = 0.0001;
 		    final double Kd = 0.0;
@@ -134,7 +135,7 @@ import edu.wpi.first.wpilibj.PIDOutput;
 			@Override
 			public void pidWrite(double rotationPower) 
 			{
-				this.m_RotationPowerDestination.setRotationPower(-rotationPower); // Inverted because it's stupid
+				this.m_RotationPowerDestination.setRotationPower(-rotationPower); // Inverted because if your off in the positive direction then need to bring it back the other way
 			}
 
 	    }

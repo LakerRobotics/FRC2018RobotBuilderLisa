@@ -47,7 +47,7 @@ public class DriveStraight extends Command {
     // Called just before this Command runs the first time
     @Override
     protected void initialize() {
-		Robot.driveTrain.the_driveTrainMotionControl.DriveDistance(m_endDistance, m_maxSpeed, 3);// distence in inches, Speed ft/sec, rampup/down
+		Robot.driveTrain.the_driveTrainMotionControl.DriveDistance(m_endDistance, m_maxSpeed, 0.5);// distence in inches, Speed ft/sec, rampup/down
     }
 
     // Called repeatedly when this Command is scheduled to run
