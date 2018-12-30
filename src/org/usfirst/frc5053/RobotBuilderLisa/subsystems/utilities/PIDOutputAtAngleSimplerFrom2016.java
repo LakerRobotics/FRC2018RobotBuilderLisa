@@ -13,7 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
  * and while passing through the left to right motor powers are tweeked so it get on the desire gyro angle drive straight
  *
  */
-public class PIDOutputStraightSimplerFrom2016 implements PIDOutput {
+public class PIDOutputAtAngleSimplerFrom2016 implements PIDOutput {
 	double m_TargetAngle = 0;
 	
    	//TODO bring this 2016 code into 2018 Code base.  this was really good at keeping the robot on a straight line, it fights really hard it you push it to get backon the right gyro angle
@@ -25,7 +25,7 @@ public class PIDOutputStraightSimplerFrom2016 implements PIDOutput {
 	Gyro m_gyro; 
 	
 
-	public PIDOutputStraightSimplerFrom2016(Gyro theGyro) {
+	public PIDOutputAtAngleSimplerFrom2016(Gyro theGyro) {
 //	    SmartDashboard.putString("rotateRobotPIDOutput", "constructor called");
 		m_gyro = theGyro;
 	}

@@ -10,18 +10,22 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class MotionController 
 {
-	private DriveTrainMotionControl m_DriveTrain;
-	private AdjustSpeedAsTravelHelper m_AdustsSpeedAsTravelStraightHelper;
+	private DriveTrainMotionControl    m_DriveTrain;
+	private AdjustSpeedAsTravelHelper  m_AdustsSpeedAsTravelStraightHelper;
 	private AdjustSpeedAsTravelMotionControlHelper m_AdjustRpmAsTurnHelper;
-	private AdjustSpeedAsTravelHelper m_AdjustSpeedAsTravelArcHelper;
+	private AdjustSpeedAsTravelHelper  m_AdjustSpeedAsTravelArcHelper;
+	
+	private AdjustAngleAsTravelHelper  m_AdjustAngleAsTravelHelper;
 	
 	private MotionControlPIDController m_StraightDistancePIDController;
-	private PIDOutputStraightMotion    m_StraightRotationPIDOutput;
+	private PIDOutputAtAngle           m_StraightRotationPIDOutput;
 	
 	private MotionControlPIDController m_TurnPIDController;
 	
+//	private MotionControlPIDController m_ArcDistancePIDController;
+//	private PIDOutputArcMotion         m_ArcRotationPIDOutput;
 	private MotionControlPIDController m_ArcDistancePIDController;
-	private PIDOutputArcMotion         m_ArcRotationPIDOutput;
+	private PIDOutputAtAngle           m_ArcRotationPIDOutput;
 	
 	private double m_DistanceToExceed;
 	private double m_targetAngle;
@@ -106,7 +110,9 @@ public class MotionController
 			if (!(Math.abs(m_DriveTrain.GetLeftDistance()) > Math.abs(m_DistanceToExceed)))
 			{
 				//Instantiates a new AdjustSpeedAsTravelMotionControlHelper() object for the driveStraightDistance we are going to traverse
-				m_StraightRotationPIDOutput = new PIDOutputStraightMotion(m_DriveTrain, m_TurnSource, m_targetAngle);
+				AdjustAngleAsTravelHelper setAngle = new AdjustAngleToBeStraightLineAsTravelHelper(m_targetAngle);
+				m_StraightRotationPIDOutput = new PIDOutputAtAngle(m_DriveTrain, m_TurnSource, setAngle);
+
 				m_AdustsSpeedAsTravelStraightHelper = new AdjustSpeedAsTravelMotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_LineSource, m_StraightRotationPIDOutput);
 				
 				//Instantiates a new MotionControlPIDController() object for the new drive segment using the previous MotionControlHelper()
@@ -176,6 +182,7 @@ public class MotionController
 	 * @return true if it has completed the arc path
 	 */
 	public boolean ExecuteArcMotion(double distance, double maxSpeed, double ramp, double radiusOfArc)
+	//TODO Redo so the have option for more accuarcy arg list is (double toExceedDistance, double maxSpeed, double startDistance, startAngle, endAngle, radiusOfArc)  
 	{
 		//TODO have it pay attention to current position and calc based on the differance
 		if(m_DistanceToExceed>0){
@@ -185,6 +192,19 @@ public class MotionController
 			isArcMovingForward = false;
 		}
 		m_DistanceToExceed = distance;//inches
+
+		// Setup for ArcAngle
+		double startDistance = this.m_DriveTrain.GetAverageDistance();
+		double distanceTraveling = distance - startDistance;
+		
+		double startAngle = this.m_DriveTrain.GetAngle();
+		
+		// calculate the target angle
+    	double distanceFullCircle = radiusOfArc * 2 * Math.PI;    	
+    	double percentOfCircleWeAreTraveling = distanceTraveling/distanceFullCircle;
+    	double angleWeNeedToTraverse = percentOfCircleWeAreTraveling * 360;
+    	double endAngle = startAngle + angleWeNeedToTraverse;
+    	    	
 //		m_DriveTrain.ResetEncoders();
 		
 		double start = 0;
@@ -202,7 +222,10 @@ public class MotionController
 //			m_StraightRotationPIDOutput = new PIDOutputStraightMotion(m_DriveTrain, m_TurnSource, m_targetAngle);
 //			m_AdustsSpeedAsTravelStraightHelper = new AdjustSpeedAsTravelMotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_StraightSource, m_StraightRotationPIDOutput);
 			// motionControlForwardSpeed
-			m_ArcRotationPIDOutput         = new PIDOutputArcMotion(m_DriveTrain, m_TurnSource, radiusOfArc);
+			AdjustAngleAsTravelHelper adjustAngleAsTravelHelper = new AdjustAngleToBeArcAsTravelHelper(startDistance, startAngle, endAngle, radiusOfArc);
+			m_ArcRotationPIDOutput = new PIDOutputAtAngle(m_DriveTrain, m_TurnSource, adjustAngleAsTravelHelper);
+
+//			m_ArcRotationPIDOutput         = new PIDOutputArcMotion(m_DriveTrain, m_TurnSource, radiusOfArc);
 			m_AdjustSpeedAsTravelArcHelper = new AdjustSpeedAsTravelMotionControlHelper(convertedDistance, convertedRamp, convertedSpeed, start, m_LineSource, m_ArcRotationPIDOutput);
 			
 //			//Instantiates a new MotionControlPIDController() object for the new drive segment using the previous MotionControlHelper()

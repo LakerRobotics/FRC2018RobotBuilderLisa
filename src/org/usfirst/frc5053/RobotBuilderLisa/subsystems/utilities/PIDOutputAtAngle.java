@@ -16,30 +16,36 @@ import edu.wpi.first.wpilibj.PIDOutput;
 	 * @author Rich Topolewski
 	 * 
 	 * Used to take the speed calculated from the PID control and pass it to the drive train, 
-	 * and also adjust the speed going to the wheels to drive straight
+	 * and also adjust the speed going to the wheels to drive at a given angle, i.e. straight or changeing i.e. arc turn
 	 *
 	 */
-	public class PIDOutputStraightMotion implements PIDOutput {
+	public class PIDOutputAtAngle implements PIDOutput {
 		
 		double maxRotationPower = 1;
 
 		private DriveTrainMotionControl m_driveTrain;
 		private PIDSource m_TurnSource;
-		private double m_targetAngle = 0.0d;
+//		private double m_targetAngle = 0.0d;
 		private double rotationPower = 0.0d;
 		private MotionControlPIDController m_RotationController;
 		
+		private AdjustAngleAsTravelHelper m_AdjustAngleAsTravelHelper;
+		
 
-		public PIDOutputStraightMotion(DriveTrainMotionControl drivetrain, PIDSource turnSource, double targetAngle) 
+		public PIDOutputAtAngle(DriveTrainMotionControl drivetrain, PIDSource turnSource, AdjustAngleAsTravelHelper adjustAngleAsTravelHelper) 
 		{
-			m_targetAngle = targetAngle;
+//			m_targetAngle = targetAngle;
+			m_AdjustAngleAsTravelHelper = adjustAngleAsTravelHelper;
 			m_driveTrain = drivetrain;
 			m_TurnSource = turnSource;
-			
-			double slowRotation = m_targetAngle + 90;// because we use motion control to start somewhere, and go to straight
+
+			double target_Angle = m_AdjustAngleAsTravelHelper.getTargetAngle(m_driveTrain.GetAverageDistance());
+			double slowRotation = target_Angle + 90;// because we use motion control, it requires a start location so it will move to this target angle, so we just need some fictituos place we started (we just grabbed 90 
+			//TODO once this is proven to work shoudl really switch this to infiity
+			//double slowRotation = Double.MAX_VALUE;
 			WrapRotationPIDOutput wrappedRotationPIDOutput =  new WrapRotationPIDOutput(this);
 			
-			m_RotationController = createRotationPIDController(m_targetAngle, slowRotation, wrappedRotationPIDOutput);
+			m_RotationController = createRotationPIDController(target_Angle, slowRotation, wrappedRotationPIDOutput);
 			
 			//WrapRotationPIDInput  wrapRotationPIDInput = new WrapRotationPIDOutput(rotationPID, (PIDSource) m_gyro);
 		}
@@ -54,11 +60,27 @@ import edu.wpi.first.wpilibj.PIDOutput;
 		{
 			this.rotationPower = rotationPower;
 		}
+		
+		/*
+		 * Not this should be called before rotational power is set, it is called during pidWrite() in this object
+		 *    which will work OK, but there will be time between calls to PID controller say 20msec (0.02 seconds) 
+		 *    so angle will always be a little off but if going really fast 10ft/sec then in that 20ms we could have
+		 *    traveled 10ft/(1/0.02)= 10/50 = 1/5 of a foot or 12in/5 = 2.4in, be it that the angle should not be much differant if traveling that 
+		 *    but if the code the calucate the rotaiton power can call ahead that would be prefered.
+		 */
+		public void recalcAndSetTargetAngle() {
+			
+			double targetAngle = m_AdjustAngleAsTravelHelper.getTargetAngle(m_driveTrain.GetAverageDistance());
+			
+			this.m_RotationController.setSetpoint(targetAngle);
+			
+		}
 
 
 		@Override
 		public synchronized void pidWrite(double motorPower) 
 		{
+			recalcAndSetTargetAngle();// see note above in this methods defintion 
 		    //rotationPower
 		   	//double rotationPower = 0;
 		   	//RobotMap.driveTrainRobotDrive21.arcadeDrive(/*moveValue*/ motorPower, /*rotateValue*/ rotationPower); 
@@ -120,9 +142,9 @@ import edu.wpi.first.wpilibj.PIDOutput;
 	    private class WrapRotationPIDOutput implements PIDOutput 
 	    {
 
-	        private PIDOutputStraightMotion m_RotationPowerDestination;
+	        private PIDOutputAtAngle m_RotationPowerDestination;
 
-	        public WrapRotationPIDOutput(PIDOutputStraightMotion rotationPowerDesintation) 
+	        public WrapRotationPIDOutput(PIDOutputAtAngle rotationPowerDesintation) 
 	        {
 	            if (rotationPowerDesintation == null) {
 	                throw new NullPointerException("Given rotationPowerDestination was null");

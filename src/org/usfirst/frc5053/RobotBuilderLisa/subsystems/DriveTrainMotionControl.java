@@ -80,7 +80,6 @@ public class DriveTrainMotionControl extends DifferentialDrive
 	}
 	
 	// Turn (piorouette)
-	//=====================================
 	public void TurnToAngle(double turnToAngle){
 		if(!isPIDRunning){
 			isPIDRunning = m_MotionController.ExecuteTurnMotion(turnToAngle);
